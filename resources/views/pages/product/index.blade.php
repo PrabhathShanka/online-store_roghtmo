@@ -306,12 +306,14 @@
                             <div class="d-inline-flex align-items-center">
                                 <a href="{{ route('product.edit', $product->id) }}"
                                     class="btn btn-primary btn-sm me-1">Edit</a>
-                                <form action="{{ route('product.destroy', $product->id) }}" method="POST"
-                                    class="d-inline">
+                                <form id="deleteForm-{{ $product->id }}"
+                                    action="{{ route('product.destroy', $product->id) }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                    <button type="button" class="btn btn-danger btn-sm"
+                                        onclick="confirmDelete({{ $product->id }})">Delete</button>
                                 </form>
+
                             </div>
                         </td>
                     </tr>
@@ -452,6 +454,35 @@
         document.querySelector('.close-btn').addEventListener('click', function() {
             document.getElementById('descriptionModal').style.display = 'none';
         });
+
+
+
+
+
+        //delete button
+
+        function confirmDelete(productId) {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You will not be able to recover this imaginary file!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonClass: "btn-danger",
+                confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "No, cancel please!",
+                reverseButtons: true,
+                closeOnConfirm: false,
+                closeOnCancel: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // If confirmed, submit the form
+                    document.getElementById(`deleteForm-${productId}`).submit();
+                    Swal.fire("Deleted!", "Your imaginary file has been deleted.", "success");
+                } else if (result.isDismissed) {
+                    Swal.fire("Cancelled", "Your imaginary file is safe :)", "error");
+                }
+            });
+        }
     </script>
 
     <script>
@@ -463,7 +494,6 @@
             }
         }, 2000); // milliseconds
     </script>
-
 
 
 
