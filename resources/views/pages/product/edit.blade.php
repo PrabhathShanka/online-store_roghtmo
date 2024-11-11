@@ -136,8 +136,6 @@
                 <span id="removeImage" class="remove-image-btn">Remove Image</span>
             </div>
 
-
-
             <!-- Multiple Image Upload Section -->
             <div class="form-group mb-3">
                 <label for="additionalImages">Add Additional Images (up to 5):</label>
@@ -146,53 +144,77 @@
                 <div id="additionalImagePreviews1" class="d-flex flex-wrap gap-3 mt-2"></div>
             </div>
 
-
-
+            <!-- Display existing images from the database -->
             <div class="form-group mb-3">
                 <div id="additionalImagePreviews" class="d-flex flex-wrap gap-3 mt-2">
                     @foreach ($product->images as $image)
                         <div class="image-preview" id="image-{{ $image->id }}">
                             <img src="{{ asset('storage/' . $image->image_path) }}" alt="Product Image"
                                 class="img-thumbnail additional-image-preview" width="100">
-                            <button type="button" class="btn btn-danger btn-sm"
+                            <button type="button" class="btn btn-danger btn-sm" style="margin: -2hitpx;"
                                 onclick="confirmDelete({{ $image->id }})">Delete</button>
+
                         </div>
                     @endforeach
                 </div>
             </div>
-
-
             <br>
-
-
-
-
 
             <button type="submit" class="btn btn-primary btn-block">Update Product</button>
         </form>
     </div>
 
     <script>
+        const maxImages = 5; // Maximum images allowed (including the existing ones)
+        const currentImages = {{ count($product->images) }}; // Count of existing images
+
         document.getElementById('additionalImages').addEventListener('change', function(e) {
-            const previewContainer = document.getElementById('additionalImagePreviews');
+            const previewContainer = document.getElementById('additionalImagePreviews1');
             previewContainer.innerHTML = ''; // Clear previous previews
 
-            Array.from(e.target.files).forEach(file => {
+            const files = Array.from(e.target.files);
+
+            // Check if the number of selected images exceeds the limit
+            if (files.length + currentImages > maxImages) {
+                alert("You can only upload a total of 5 images.");
+                this.value = ''; // Clear the input
+                return;
+            }
+
+            files.forEach((file, index) => {
                 const reader = new FileReader();
-                reader.onload = function(event) {
-                    const img = document.createElement('img');
-                    img.src = event.target.result;
-                    img.classList.add('img-thumbnail');
-                    img.width = 100;
-                    previewContainer.appendChild(img);
+                const previewWrapper = document.createElement('div');
+                previewWrapper.style.position = 'relative';
+
+                const previewImage = document.createElement('img');
+                previewImage.classList.add('image-preview');
+                previewWrapper.appendChild(previewImage);
+
+                const removeButton = document.createElement('span');
+                removeButton.textContent = 'Remove Image';
+                removeButton.classList.add('remove-image-btn');
+                previewWrapper.appendChild(removeButton);
+
+                previewContainer.appendChild(previewWrapper);
+
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                    previewImage.style.display = 'block';
+                    removeButton.style.display = 'inline';
                 };
                 reader.readAsDataURL(file);
+
+                // Event listener to remove image
+                removeButton.addEventListener('click', function() {
+                    previewWrapper.remove();
+                    const fileList = Array.from(document.getElementById('additionalImages').files);
+                    fileList.splice(index, 1);
+                    const dataTransfer = new DataTransfer();
+                    fileList.forEach(file => dataTransfer.items.add(file));
+                    document.getElementById('additionalImages').files = dataTransfer.files;
+                });
             });
         });
-
-
-
-
 
         document.getElementById('mainImage').addEventListener('change', function(event) {
             const preview = document.getElementById('imagePreview');
@@ -231,22 +253,14 @@
             }
         });
 
-
-
-        //delete image
-
+        // Image Deletion
         function confirmDelete(imageId) {
-            // Show a confirmation dialog
             if (confirm('Are you sure you want to delete this image?')) {
-                // If the user clicks "Yes", delete the image
                 deleteImage(imageId);
             }
         }
 
         function deleteImage(imageId) {
-            // Here you can use AJAX or send a request to delete the image from the server.
-            // For example, sending an AJAX request to a Laravel route:
-
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
             fetch(`/delete-image/${imageId}`, {
@@ -262,7 +276,6 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // If deletion is successful, remove the image element from the DOM
                         const imageElement = document.getElementById(`image-${imageId}`);
                         if (imageElement) {
                             imageElement.remove();
@@ -276,59 +289,5 @@
                     alert('An error occurred while deleting the image.');
                 });
         }
-
-
-
-
-
-        // Multiple Images Preview
-        document.getElementById('additionalImages').addEventListener('change', function(event) {
-            const previewContainer = document.getElementById('additionalImagePreviews1');
-            previewContainer.innerHTML = ''; // Clear existing previews
-            const files = Array.from(event.target.files);
-
-            if (files.length > 5) {
-                alert("You can only upload up to 5 images.");
-                this.value = ''; // Clear the input
-                return;
-            }
-
-            files.forEach((file, index) => {
-                const reader = new FileReader();
-                const previewWrapper = document.createElement('div');
-                previewWrapper.style.position = 'relative';
-
-                const previewImage = document.createElement('img');
-                previewImage.classList.add('image-preview');
-                previewWrapper.appendChild(previewImage);
-
-                const removeButton = document.createElement('span');
-                removeButton.textContent = 'Remove Image';
-                removeButton.classList.add('remove-image-btn');
-                removeButton.style.position = 'absolute';
-                removeButton.style.top = '5px';
-                removeButton.style.right = '5px';
-                previewWrapper.appendChild(removeButton);
-
-                previewContainer.appendChild(previewWrapper);
-
-                reader.onload = function(e) {
-                    previewImage.src = e.target.result;
-                    previewImage.style.display = 'block';
-                    removeButton.style.display = 'inline';
-                };
-                reader.readAsDataURL(file);
-
-                // Event listener to remove image
-                removeButton.addEventListener('click', function() {
-                    previewWrapper.remove();
-                    const fileList = Array.from(document.getElementById('additionalImages').files);
-                    fileList.splice(index, 1);
-                    const dataTransfer = new DataTransfer();
-                    fileList.forEach(file => dataTransfer.items.add(file));
-                    document.getElementById('additionalImages').files = dataTransfer.files;
-                });
-            });
-        });
     </script>
 @endsection
