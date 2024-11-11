@@ -148,16 +148,17 @@
             <div class="form-group mb-3">
                 <div id="additionalImagePreviews" class="d-flex flex-wrap gap-3 mt-2">
                     @foreach ($product->images as $image)
-                        <div class="image-preview" id="image-{{ $image->id }}">
+                        <div class="image-preview" id="image-{{ $image->id }}"
+                            style="margin-bottom: 25px; margin-right: 15px;">
                             <img src="{{ asset('storage/' . $image->image_path) }}" alt="Product Image"
-                                class="img-thumbnail additional-image-preview" width="100">
-                            <button type="button" class="btn btn-danger btn-sm" style="margin: -2hitpx;"
-                                onclick="confirmDelete({{ $image->id }})">Delete</button>
-
+                                class="img-thumbnail additional-image-preview" width="100" style="margin-right: 10px;">
+                            <button type="button" class="btn btn-danger" onclick="confirmDelete({{ $image->id }})"
+                                style="margin-left: 5px;">Delete</button>
                         </div>
                     @endforeach
                 </div>
             </div>
+
             <br>
 
             <button type="submit" class="btn btn-primary btn-block">Update Product</button>
@@ -254,40 +255,51 @@
         });
 
         // Image Deletion
+        // Function to handle image deletion with SweetAlert confirmation
         function confirmDelete(imageId) {
-            if (confirm('Are you sure you want to delete this image?')) {
-                deleteImage(imageId);
-            }
-        }
-
-        function deleteImage(imageId) {
-            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-            fetch(`/delete-image/${imageId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken
-                    },
-                    body: JSON.stringify({
-                        imageId
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const imageElement = document.getElementById(`image-${imageId}`);
-                        if (imageElement) {
-                            imageElement.remove();
-                        }
-                    } else {
-                        alert('Failed to delete the image.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while deleting the image.');
-                });
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You will not be able to recover this imaginary file!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonClass: "btn-danger",
+                confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "No, cancel please!",
+                reverseButtons: true,
+                preConfirm: () => {
+                    // Send AJAX request to delete the image
+                    return fetch(`/delete-image/${imageId}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                    .getAttribute('content')
+                            },
+                            body: JSON.stringify({
+                                imageId
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire("Deleted!", "Your imaginary file has been deleted.", "success")
+                                    .then(() => {
+                                        // Reload the page after successful deletion
+                                        location.reload();
+                                    });
+                            } else {
+                                Swal.fire("Failed", "Failed to delete the image.", "error");
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            Swal.fire("Error", "An error occurred while deleting the image.", "error");
+                        });
+                }
+            });
         }
     </script>
+
+
+
 @endsection
