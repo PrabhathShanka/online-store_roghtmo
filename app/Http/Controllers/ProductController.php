@@ -131,6 +131,14 @@ class ProductController extends Controller
 
     public function update(Request $request, $id)
     {
+        // Retrieve the product and count existing additional images
+        $product = Product::findOrFail($id);
+        $existingImageCount = $product->images()->count();
+
+        // Calculate how many additional images can be uploaded (max 5 total)
+        $remainingSlots = 5 - $existingImageCount;
+
+        // Validate the request
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string',
@@ -138,11 +146,11 @@ class ProductController extends Controller
             'stock' => 'required|integer',
             'category_id' => 'required|exists:product_categories,id',
             'mainImage' => 'nullable|image|mimes:jpeg,png,jpg|max:10240',
-            'additionalImages' => 'nullable|array|max:5', // Limit to 5 images
+            'additionalImages' => ['nullable', 'array', 'max:' . $remainingSlots], // Limit additional images based on remaining slots
             'additionalImages.*' => 'nullable|image|mimes:jpeg,png,jpg|max:10240', // Validate each image
         ]);
 
-        $product = Product::findOrFail($id);
+        // Prepare data for updating the product
         $data = $request->all();
 
         // Handle main image upload
@@ -165,9 +173,8 @@ class ProductController extends Controller
         // Update product details (name, description, price, etc.)
         $product->update($data);
 
-        // Handle additional images
+        // Handle additional images if provided
         if ($request->hasFile('additionalImages')) {
-            // Loop through each uploaded file and store them
             foreach ($request->file('additionalImages') as $file) {
                 $imagePath = $file->store('products/', 'public');
 
@@ -178,9 +185,11 @@ class ProductController extends Controller
             }
         }
 
+        // Set success message and redirect
         session()->flash('success', 'Product updated successfully!');
         return redirect()->route('product.index');
     }
+
 
 
 

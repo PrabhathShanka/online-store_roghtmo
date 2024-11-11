@@ -1,65 +1,243 @@
-public function update(Request $request, $id)
-{
-$request->validate([
-'name' => 'required|string|max:255',
-'description' => 'required|string',
-'price' => 'required|numeric',
-'stock' => 'required|integer',
-'category_id' => 'required|exists:product_categories,id',
-'mainImage' => 'nullable|image|mimes:jpeg,png,jpg|max:10240',
-'additionalImages' => 'nullable|array|max:5', // Limit to 5 images
-'additionalImages.*' => 'nullable|image|mimes:jpeg,png,jpg|max:10240', // Validate each image
-]);
+@extends('layouts.app')
 
-$product = Product::findOrFail($id);
-$data = $request->all();
+{{--  @section('head')
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+@endsection  --}}
 
-// Handle main image upload
-if ($request->hasFile('mainImage')) {
-$defaultImagePath = 'products/MainImage/default.png';
+@section('styles')
+    <style>
+        .form-container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #52dd98;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
 
-// Delete the old image if it exists and is not the default image
-if ($product->mainImage && $product->mainImage !== $defaultImagePath) {
-$imagePath = storage_path('app/public/' . $product->mainImage);
-if (file_exists($imagePath)) {
-unlink($imagePath);
-}
-}
+        .image-preview {
+            margin-top: 5px;
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+        }
 
-// Store the new image
-$imagePath = $request->file('mainImage')->store('products/MainImage', 'public');
-$data['mainImage'] = $imagePath;
-}
+        .remove-image-btn {
+            margin-top: 10px;
+            display: none;
+            color: red;
+            cursor: pointer;
+        }
 
-// Update product details (name, description, price, etc.)
-$product->update($data);
+        .additional-image-preview {
+            margin-top: 5px;
+            width: 140px;
+            height: 140px;
+            object-fit: cover;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+        }
+    </style>
+@endsection
 
-// Handle additional images
-if ($request->hasFile('additionalImages')) {
-// Loop through each uploaded file and store them
-foreach ($request->file('additionalImages') as $file) {
-$imagePath = $file->store('products/', 'public');
+@section('content')
+    @if ($errors->any())
+        <div class="alert alert-danger" style="position: relative; padding: 1rem;">
+            <ul style="margin: 0;">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+            <span style="position: absolute; right: 10px; top: 10px;">
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </span>
+        </div>
+    @endif
 
-// Store each additional image in a related table (assuming you have a product_images table)
-$product->images()->create([
-'image_path' => $imagePath,
-]);
-}
-}
+    <div class="container form-container">
+        <h1 class="text-center mb-4">Edit Product</h1>
 
-// If needed, remove old additional images not included in the update (optional)
-// This step requires you to identify the images that are to be removed from the database
-if ($request->input('removed_images')) {
-$removedImageIds = $request->input('removed_images');
-foreach ($removedImageIds as $imageId) {
-$image = ProductImage::find($imageId);
-if ($image && file_exists(storage_path('app/public/' . $image->image_path))) {
-unlink(storage_path('app/public/' . $image->image_path));
-$image->delete();
-}
-}
-}
+        <form action="{{ route('product.update', $product->id) }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            @method('PUT')
 
-session()->flash('success', 'Product updated successfully!');
-return redirect()->route('product.index');
-}
+            <div class="form-group mb-3">
+                <label for="name">Product Name:</label>
+                <input type="text" class="form-control" id="name" name="name"
+                    value="{{ old('name', $product->name) }}" required>
+                @error('name')
+                    <div class="text-danger">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <!-- Add other fields like description, price, etc. -->
+
+            {{-- Display the current image if available --}}
+            <div class="form-group mb-3">
+                <label for="mainImage">Product Image:</label>
+                <input type="file" class="form-control" id="mainImage" name="mainImage" accept="image/*">
+                @if ($product->mainImage)
+                    <div class="mt-2">
+                        <img src="{{ asset('storage/' . $product->mainImage) }}" alt="Product Image" class="img-thumbnail"
+                            width="150">
+                    </div>
+                @endif
+                <img id="imagePreview" class="image-preview" style="display:none;">
+                <span id="removeImage" class="remove-image-btn">Remove Image</span>
+            </div>
+
+            <!-- Multiple Image Upload Section -->
+            <div class="form-group mb-3">
+                <label for="additionalImages">Add Additional Images (up to 5):</label>
+                <input type="file" class="form-control" id="additionalImages" name="additionalImages[]" accept="image/*"
+                    multiple>
+                <div id="additionalImagePreviews1" class="d-flex flex-wrap gap-3 mt-2"></div>
+            </div>
+
+            <!-- Display existing images from the database -->
+            <div class="form-group mb-3">
+                <div id="additionalImagePreviews" class="d-flex flex-wrap gap-3 mt-2">
+                    @foreach ($product->images as $image)
+                        <div class="image-preview" id="image-{{ $image->id }}">
+                            <img src="{{ asset('storage/' . $image->image_path) }}" alt="Product Image"
+                                class="img-thumbnail additional-image-preview" width="100">
+                            <button type="button" class="btn btn-danger btn-sm"
+                                onclick="confirmDelete({{ $image->id }})">Delete</button>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">Update Product</button>
+        </form>
+    </div>
+
+    <script>
+        const maxImages = 5; // Maximum images allowed (including the existing ones)
+        const currentImages = {{ count($product->images) }}; // Count of existing images
+
+        document.getElementById('additionalImages').addEventListener('change', function(e) {
+            const previewContainer = document.getElementById('additionalImagePreviews1');
+            previewContainer.innerHTML = ''; // Clear previous previews
+
+            const files = Array.from(e.target.files);
+
+            // Check if the number of selected images exceeds the limit
+            if (files.length + currentImages > maxImages) {
+                alert("You can only upload a total of 5 images.");
+                this.value = ''; // Clear the input
+                return;
+            }
+
+            files.forEach((file, index) => {
+                const reader = new FileReader();
+                const previewWrapper = document.createElement('div');
+                previewWrapper.style.position = 'relative';
+
+                const previewImage = document.createElement('img');
+                previewImage.classList.add('image-preview');
+                previewWrapper.appendChild(previewImage);
+
+                const removeButton = document.createElement('span');
+                removeButton.textContent = 'Remove Image';
+                removeButton.classList.add('remove-image-btn');
+                previewWrapper.appendChild(removeButton);
+
+                previewContainer.appendChild(previewWrapper);
+
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                    previewImage.style.display = 'block';
+                    removeButton.style.display = 'inline';
+                };
+                reader.readAsDataURL(file);
+
+                // Event listener to remove image
+                removeButton.addEventListener('click', function() {
+                    previewWrapper.remove();
+                    const fileList = Array.from(document.getElementById('additionalImages').files);
+                    fileList.splice(index, 1);
+                    const dataTransfer = new DataTransfer();
+                    fileList.forEach(file => dataTransfer.items.add(file));
+                    document.getElementById('additionalImages').files = dataTransfer.files;
+                });
+            });
+        });
+
+        document.getElementById('mainImage').addEventListener('change', function(event) {
+            const preview = document.getElementById('imagePreview');
+            const removeButton = document.getElementById('removeImage');
+            const currentImage = document.querySelector('.img-thumbnail');
+            const file = event.target.files[0];
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                    removeButton.style.display = 'inline';
+
+                    // Hide the current image preview if a new image is selected
+                    if (currentImage) {
+                        currentImage.style.display = 'none';
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('removeImage').addEventListener('click', function() {
+            const fileInput = document.getElementById('mainImage');
+            const preview = document.getElementById('imagePreview');
+            const currentImage = document.querySelector('.img-thumbnail');
+
+            fileInput.value = ''; // Clear the file input
+            preview.style.display = 'none'; // Hide the preview
+            this.style.display = 'none'; // Hide the remove button
+
+            // Show the original image again if it exists
+            if (currentImage) {
+                currentImage.style.display = 'block';
+            }
+        });
+
+        // Image Deletion
+        function confirmDelete(imageId) {
+            if (confirm('Are you sure you want to delete this image?')) {
+                deleteImage(imageId);
+            }
+        }
+
+        function deleteImage(imageId) {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+            fetch(`/delete-image/${imageId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify({
+                        imageId
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const imageElement = document.getElementById(`image-${imageId}`);
+                        if (imageElement) {
+                            imageElement.remove();
+                        }
+                    } else {
+                        alert('Failed to delete the image.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while deleting the image.');
+                });
+        }
+    </script>
+@endsection
