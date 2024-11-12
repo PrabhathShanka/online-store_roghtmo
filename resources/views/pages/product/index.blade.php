@@ -479,7 +479,7 @@
                     document.getElementById(`deleteForm-${productId}`).submit();
                     Swal.fire("Deleted!", "Your imaginary file has been deleted.", "success");
                 } else if (result.isDismissed) {
-                    Swal.fire("Cancelled", "Your imaginary file is safe :)", "error");
+                    Swal.fire("Cancelled", "Your imaginary file is safe", "error");
                 }
             });
         }

@@ -23,8 +23,8 @@
             height: 150px;
             /* Set desired height */
             object-fit: cover;
-            /* Crops image to fit within the area */
-            border: 2px solid #ddd;
+            {{--  /* Crops image to fit within the area */
+            border: 2px solid #52dd98;  --}}
             /* Optional border */
             border-radius: 8px;
             /* Optional rounded corners */
