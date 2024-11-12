@@ -2,16 +2,142 @@
 
 @section('styles')
     <style>
-        /* Table container styling */
-        .table-container {
-            max-width: 75%;
-            margin: 50px auto;
+        body {
+
+            .table-container.card {
+                display: none;
+            }
+
+            .table-container {
+                display: block;
+            }
+
+            background-color: lightgreen;
+
+            /* Table container styling */
+            .table-container {
+                max-width: 90%;
+                margin: 50px auto;
+            }
+
+            .pagination-container {
+                max-width: 80%;
+                margin: 0 auto;
+            }
+
+            .product-image {
+                width: 170px;
+                height: 170px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background-size: cover;
+                background-position: center;
+            }
+
+
+
         }
 
-        .pagination-container {
-            max-width: 75%;
-            margin: 0 auto;
+        /* On screens that are 992px wide or less, the background color is blue */
+        @media screen and (max-width: 1200px) {
+            body {
+
+                .table-container.card {
+                    display: none;
+                }
+
+                .table-container {
+                    display: block;
+                }
+
+
+                background-color: rgb(43, 60, 190);
+
+                /* Table container styling */
+                .table-container {
+                    max-width: 90%;
+                    margin: 50px auto;
+                }
+
+                .pagination-container {
+                    max-width: 80%;
+                    margin: 0 auto;
+                }
+
+                .product-image {
+                    width: 140px;
+                    height: 140px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    background-size: cover;
+                    background-position: center;
+                }
+            }
         }
+
+        /* On screens that are 600px wide or less, the background color is olive */
+        @media screen and (max-width: 992px) {
+            body {
+                background-color: rgb(190, 43, 165);
+
+
+                .table-container.card {
+                    display: none;
+                }
+
+                .table-container {
+                    display: block;
+                }
+
+                /* Table container styling */
+                .container,
+                .container-md,
+                .container-sm {
+                    max-width: max-content;
+                }
+
+                .table-container {
+                    max-width: 100%;
+                    margin: 50px auto;
+                }
+
+                .pagination-container {
+                    max-width: 80%;
+                    margin: 0 auto;
+                }
+
+                .product-image {
+                    width: 140px;
+                    height: 140px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    background-size: cover;
+                    background-position: center;
+                }
+            }
+        }
+
+
+        /* Styling for screens 877px or smaller */
+        @media screen and (max-width: 877px) {
+            body {
+                .table-container {
+                    display: none;
+                }
+
+
+
+                .table-container.card {
+                    display: block;
+                }
+
+
+            }
+        }
+
 
         /* Category Filter and Refresh Button styling */
         .category-filter {
@@ -153,293 +279,444 @@
 
 
 @section('content')
-    {{-- Display error messages --}}
-    @if ($errors->any())
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
+    <div class="container">
 
-    {{-- Session success message --}}
-    @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
+        {{-- Display error messages --}}
+        @if ($errors->any())
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
 
-    <div class="container table-container">
-        <h1 class="text-center mb-4">Product List</h1>
+        {{-- Session success message --}}
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
 
-        <!-- Add Product Button -->
-        <div class="mb-3">
-            <a href="{{ route('product.create') }}" class="btn btn-success">Add Product</a>
-        </div>
 
-        <div class="row">
-            {{-- Category Filter --}}
-            <div class="category-filter mb-3 col-lg-5">
-                <form action="{{ route('product.index') }}" method="GET" class="d-inline">
-                    <select class="form-select" name="category_id" onchange="this.form.submit()">
-                        <option value="">Select Category</option>
-                        @foreach ($categories as $category)
-                            <option value="{{ $category->id }}"
-                                {{ request('category_id') == $category->id ? 'selected' : '' }}>
-                                {{ $category->name }}
-                            </option>
+
+        {{--  -------------------------------------------------------------------------  --}}
+
+        <div class="table-container">
+            <h1 class="text-center mb-4">Product List</h1>
+
+            <!-- Add Product Button -->
+            <div class="mb-3">
+                <a href="{{ route('product.create') }}" class="btn btn-success">Add Product</a>
+            </div>
+
+            <div class="row">
+                {{-- Category Filter --}}
+                <div class="category-filter mb-3 col-lg-5">
+                    <form action="{{ route('product.index') }}" method="GET" class="d-inline">
+                        <select class="form-select" name="category_id" onchange="this.form.submit()">
+                            <option value="">Select Category</option>
+                            @foreach ($categories as $category)
+                                <option value="{{ $category->id }}"
+                                    {{ request('category_id') == $category->id ? 'selected' : '' }}>
+                                    {{ $category->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </form>
+                </div>
+
+                {{-- Product Search --}}
+                <div class="mb-3 col-lg-5">
+                    <form action="{{ route('product.index') }}" method="GET">
+                        <input type="hidden" name="category_id" value="{{ request('category_id') }}">
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="search" placeholder="Search products..."
+                                value="{{ request('search') }}">
+                            <button class="btn btn-primary" type="submit">Search</button>
+                        </div>
+                    </form>
+                </div>
+
+                {{-- Reset Filter Button --}}
+                <div class="mb-3 col-lg-2">
+                    <a href="{{ route('product.index') }}" class="btn refresh-button ms-1">RESET</a>
+                </div>
+            </div>
+
+            <!-- Product Table -->
+            <div class="container-fluid table-wrap">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th class="column-id">
+                                <a
+                                    href="{{ route('product.index', ['sort_column' => 'id', 'sort_direction' => $sortDirection == 'asc' ? 'desc' : 'asc', 'search' => request('search'), 'category_id' => request('category_id')]) }}">
+                                    ID @if ($sortColumn == 'id')
+                                        <span>{{ $sortDirection == 'asc' ? '↑' : '↓' }}</span>
+                                    @endif
+                                </a>
+                            </th>
+                            <th class="column-image">Image</th>
+                            <th class="column-name">
+                                <a
+                                    href="{{ route('product.index', ['sort_column' => 'name', 'sort_direction' => $sortDirection == 'asc' ? 'desc' : 'asc', 'search' => request('search'), 'category_id' => request('category_id')]) }}">
+                                    Name @if ($sortColumn == 'name')
+                                        <span>{{ $sortDirection == 'asc' ? '↑' : '↓' }}</span>
+                                    @endif
+                                </a>
+                            </th>
+                            <th class="column-description">
+                                <a
+                                    href="{{ route('product.index', ['sort_column' => 'description', 'sort_direction' => $sortDirection == 'asc' ? 'desc' : 'asc', 'search' => request('search'), 'category_id' => request('category_id')]) }}">
+                                    Description @if ($sortColumn == 'description')
+                                        <span>{{ $sortDirection == 'asc' ? '↑' : '↓' }}</span>
+                                    @endif
+                                </a>
+                            </th>
+                            <th class="column-price">
+                                <a
+                                    href="{{ route('product.index', ['sort_column' => 'price', 'sort_direction' => $sortDirection == 'asc' ? 'desc' : 'asc', 'search' => request('search'), 'category_id' => request('category_id')]) }}">
+                                    Price @if ($sortColumn == 'price')
+                                        <span>{{ $sortDirection == 'asc' ? '↑' : '↓' }}</span>
+                                    @endif
+                                </a>
+                            </th>
+                            <th class="column-stock">
+                                <a
+                                    href="{{ route('product.index', ['sort_column' => 'stock', 'sort_direction' => $sortDirection == 'asc' ? 'desc' : 'asc', 'search' => request('search'), 'category_id' => request('category_id')]) }}">
+                                    Stock @if ($sortColumn == 'stock')
+                                        <span>{{ $sortDirection == 'asc' ? '↑' : '↓' }}</span>
+                                    @endif
+                                </a>
+                            </th>
+                            <th class="column-category">Category</th>
+                            <th class="column-actions">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($products as $product)
+                            <tr>
+                                <td>{{ $product->id }}</td>
+
+
+                                <th style="text-align: center; vertical-align: middle;">
+
+                                    @if ($product->mainImage)
+                                        <div class="product-image"
+                                            style="background-image: url('{{ asset('storage/' . $product->mainImage) }}');">
+                                            <!-- Content (if any) goes here -->
+                                        </div>
+                                    @else
+                                        <div
+                                            style="width: 170px; height: 170px; display: flex; justify-content: center; align-items: center; overflow: hidden; background-color: #f0f0f0;">
+                                            <span>No image available</span>
+                                        </div>
+                                    @endif
+
+                                    <!-- "More" button to load additional images -->
+                                    <button class="btn btn-link btn-sm" onclick="loadMoreImages({{ $product->id }})"
+                                        style="margin-top: 10px;">More</button>
+
+                                </th>
+
+
+
+
+
+                                <td>{{ $product->name }}</td>
+                                <td>
+                                    <span class="short-description">{{ Str::limit($product->description, 20) }}</span>
+                                    <button class="btn btn-link btn-sm"
+                                        onclick="showFullDescription('{{ addslashes($product->description) }}')">More</button>
+                                </td>
+                                <td>{{ $product->price }}</td>
+                                <td>{{ $product->stock }}</td>
+                                <td>{{ $product->category->name ?? 'N/A' }}</td>
+                                <td>
+                                    <div class="d-inline-flex align-items-center">
+                                        <a href="{{ route('product.edit', $product->id) }}"
+                                            class="btn btn-primary btn-sm me-1">Edit</a>
+                                        <form id="deleteForm-{{ $product->id }}"
+                                            action="{{ route('product.destroy', $product->id) }}" method="POST"
+                                            class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="button" class="btn btn-danger btn-sm"
+                                                onclick="confirmDelete({{ $product->id }})">Delete</button>
+                                        </form>
+
+                                    </div>
+                                </td>
+                            </tr>
                         @endforeach
-                    </select>
-                </form>
+                    </tbody>
+                </table>
+
             </div>
 
-            {{-- Product Search --}}
-            <div class="mb-3 col-lg-5">
-                <form action="{{ route('product.index') }}" method="GET">
-                    <input type="hidden" name="category_id" value="{{ request('category_id') }}">
-                    <div class="input-group">
-                        <input type="text" class="form-control" name="search" placeholder="Search products..."
-                            value="{{ request('search') }}">
-                        <button class="btn btn-primary" type="submit">Search</button>
+
+
+            <!-- Modal for image preview with carousel functionality -->
+            <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <!-- Carousel for images without automatic sliding -->
+                            <div id="imageCarousel" class="carousel slide">
+                                <div class="carousel-inner" id="carouselInner">
+                                    <!-- Images will be dynamically added here -->
+                                </div>
+                                <!-- Carousel controls -->
+                                <button class="carousel-control-prev" type="button" data-bs-target="#imageCarousel"
+                                    data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#imageCarousel"
+                                    data-bs-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
+                            </div>
+
+                            <!-- Zoom In and Zoom Out Buttons -->
+                            <div class="zoom-buttons mt-3 text-center">
+                                <button id="zoomIn" class="btn btn-primary mx-2">Zoom In</button>
+                                <button id="zoomOut" class="btn btn-secondary mx-2">Zoom Out</button>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
                     </div>
-                </form>
+                </div>
             </div>
 
-            {{-- Reset Filter Button --}}
-            <div class="mb-3 col-lg-2">
-                <a href="{{ route('product.index') }}" class="btn refresh-button ms-1">RESET</a>
+            {{-- Pagination links --}}
+            <div class="pagination-container d-flex justify-content-center">
+                {{ $products->links() }}
             </div>
+
         </div>
 
-        <!-- Product Table -->
-        <table class="table table-bordered table-striped">
-            <thead>
-                <tr>
-                    <th class="column-id">
-                        <a
-                            href="{{ route('product.index', ['sort_column' => 'id', 'sort_direction' => $sortDirection == 'asc' ? 'desc' : 'asc', 'search' => request('search'), 'category_id' => request('category_id')]) }}">
-                            ID @if ($sortColumn == 'id')
-                                <span>{{ $sortDirection == 'asc' ? '↑' : '↓' }}</span>
-                            @endif
-                        </a>
-                    </th>
-                    <th class="column-image">Image</th>
-                    <th class="column-name">
-                        <a
-                            href="{{ route('product.index', ['sort_column' => 'name', 'sort_direction' => $sortDirection == 'asc' ? 'desc' : 'asc', 'search' => request('search'), 'category_id' => request('category_id')]) }}">
-                            Name @if ($sortColumn == 'name')
-                                <span>{{ $sortDirection == 'asc' ? '↑' : '↓' }}</span>
-                            @endif
-                        </a>
-                    </th>
-                    <th class="column-description">
-                        <a
-                            href="{{ route('product.index', ['sort_column' => 'description', 'sort_direction' => $sortDirection == 'asc' ? 'desc' : 'asc', 'search' => request('search'), 'category_id' => request('category_id')]) }}">
-                            Description @if ($sortColumn == 'description')
-                                <span>{{ $sortDirection == 'asc' ? '↑' : '↓' }}</span>
-                            @endif
-                        </a>
-                    </th>
-                    <th class="column-price">
-                        <a
-                            href="{{ route('product.index', ['sort_column' => 'price', 'sort_direction' => $sortDirection == 'asc' ? 'desc' : 'asc', 'search' => request('search'), 'category_id' => request('category_id')]) }}">
-                            Price @if ($sortColumn == 'price')
-                                <span>{{ $sortDirection == 'asc' ? '↑' : '↓' }}</span>
-                            @endif
-                        </a>
-                    </th>
-                    <th class="column-stock">
-                        <a
-                            href="{{ route('product.index', ['sort_column' => 'stock', 'sort_direction' => $sortDirection == 'asc' ? 'desc' : 'asc', 'search' => request('search'), 'category_id' => request('category_id')]) }}">
-                            Stock @if ($sortColumn == 'stock')
-                                <span>{{ $sortDirection == 'asc' ? '↑' : '↓' }}</span>
-                            @endif
-                        </a>
-                    </th>
-                    <th class="column-category">Category</th>
-                    <th class="column-actions">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
+
+        <div class="table-container card">
+            <h1 class="text-center mb-4">Product List</h1>
+
+            <!-- Add Product Button -->
+            <div class="mb-3">
+                <a href="{{ route('product.create') }}" class="btn btn-success">Add Product</a>
+            </div>
+
+            <div class="row">
+                <!-- Category Filter -->
+                <div class="category-filter mb-3 col-lg-5">
+                    <form action="{{ route('product.index') }}" method="GET" class="d-inline">
+                        <select class="form-select" name="category_id" onchange="this.form.submit()">
+                            <option value="">Select Category</option>
+                            @foreach ($categories as $category)
+                                <option value="{{ $category->id }}"
+                                    {{ request('category_id') == $category->id ? 'selected' : '' }}>
+                                    {{ $category->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </form>
+                </div>
+
+                <!-- Product Search -->
+                <div class="mb-3 col-lg-5">
+                    <form action="{{ route('product.index') }}" method="GET">
+                        <input type="hidden" name="category_id" value="{{ request('category_id') }}">
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="search" placeholder="Search products..."
+                                value="{{ request('search') }}">
+                            <button class="btn btn-primary" type="submit">Search</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Reset Filter Button -->
+                <div class="mb-3 col-lg-2">
+                    <a href="{{ route('product.index') }}" class="btn refresh-button ms-1">RESET</a>
+                </div>
+            </div>
+
+            <!-- Product Cards -->
+            <div class="row">
                 @foreach ($products as $product)
-                    <tr>
-                        <td>{{ $product->id }}</td>
-
-
-                        <th style="text-align: center; vertical-align: middle;">
-
+                    <div class="col-md-4 mb-4">
+                        <div class="card" style="width: 18rem;">
+                            <!-- Product Image -->
                             @if ($product->mainImage)
-                                <div
-                                    style="width: 170px; height: 170px; display: flex; justify-content: center; align-items: center;  background-image: url('{{ asset('storage/' . $product->mainImage) }}'); background-size: cover;  background-position: center;">
-                                </div>
+                                <img src="{{ asset('storage/' . $product->mainImage) }}" class="card-img-top"
+                                    alt="Product Image">
                             @else
                                 <div
-                                    style="width: 170px; height: 170px; display: flex; justify-content: center; align-items: center; overflow: hidden; background-color: #f0f0f0;">
+                                    style="width: 100%; height: 180px; background-color: #f0f0f0; display: flex; align-items: center; justify-content: center;">
                                     <span>No image available</span>
                                 </div>
                             @endif
 
-                            <!-- "More" button to load additional images -->
-                            <button class="btn btn-link btn-sm" onclick="loadMoreImages({{ $product->id }})"
-                                style="margin-top: 10px;">More</button>
+                            <!-- Card Body -->
+                            <div class="card-body">
+                                <h5 class="card-title">{{ $product->name }}</h5>
+                                <p class="card-text">{{ Str::limit($product->description, 50) }}</p>
+                                <p class="card-text">Price: ${{ $product->price }}</p>
+                                <p class="card-text">Stock: {{ $product->stock }}</p>
+                                <p class="card-text">Category: {{ $product->category->name ?? 'N/A' }}</p>
+                            </div>
 
-                        </th>
+                            <!-- List Group for Sorting and Category Info -->
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">
+                                    <a
+                                        href="{{ route('product.index', ['sort_column' => 'id', 'sort_direction' => $sortDirection == 'asc' ? 'desc' : 'asc', 'search' => request('search'), 'category_id' => request('category_id')]) }}">
+                                        Sort by ID {{ $sortColumn == 'id' ? ($sortDirection == 'asc' ? '↑' : '↓') : '' }}
+                                    </a>
+                                </li>
+                                <!-- Additional items could be added here if needed -->
+                            </ul>
 
-
-
-
-
-                        <td>{{ $product->name }}</td>
-                        <td>
-                            <span class="short-description">{{ Str::limit($product->description, 20) }}</span>
-                            <button class="btn btn-link btn-sm"
-                                onclick="showFullDescription('{{ addslashes($product->description) }}')">More</button>
-                        </td>
-                        <td>{{ $product->price }}</td>
-                        <td>{{ $product->stock }}</td>
-                        <td>{{ $product->category->name ?? 'N/A' }}</td>
-                        <td>
-                            <div class="d-inline-flex align-items-center">
+                            <!-- Card Footer with Action Links -->
+                            <div class="card-body d-flex justify-content-between">
                                 <a href="{{ route('product.edit', $product->id) }}"
-                                    class="btn btn-primary btn-sm me-1">Edit</a>
+                                    class="btn btn-primary btn-sm">Edit</a>
                                 <form id="deleteForm-{{ $product->id }}"
-                                    action="{{ route('product.destroy', $product->id) }}" method="POST" class="d-inline">
+                                    action="{{ route('product.destroy', $product->id) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
                                     <button type="button" class="btn btn-danger btn-sm"
                                         onclick="confirmDelete({{ $product->id }})">Delete</button>
                                 </form>
-
                             </div>
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-
-
-
-        <!-- Modal for image preview with carousel functionality -->
-        <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-body">
-                        <!-- Carousel for images without automatic sliding -->
-                        <div id="imageCarousel" class="carousel slide">
-                            <div class="carousel-inner" id="carouselInner">
-                                <!-- Images will be dynamically added here -->
-                            </div>
-                            <!-- Carousel controls -->
-                            <button class="carousel-control-prev" type="button" data-bs-target="#imageCarousel"
-                                data-bs-slide="prev">
-                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Previous</span>
-                            </button>
-                            <button class="carousel-control-next" type="button" data-bs-target="#imageCarousel"
-                                data-bs-slide="next">
-                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Next</span>
-                            </button>
-                        </div>
-
-                        <!-- Zoom In and Zoom Out Buttons -->
-                        <div class="zoom-buttons mt-3 text-center">
-                            <button id="zoomIn" class="btn btn-primary mx-2">Zoom In</button>
-                            <button id="zoomOut" class="btn btn-secondary mx-2">Zoom Out</button>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                @endforeach
+            </div>
+
+            <!-- Modal for image preview (for additional image view if needed) -->
+            <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <div id="imageCarousel" class="carousel slide">
+                                <div class="carousel-inner" id="carouselInner">
+                                    <!-- Images will be dynamically added here -->
+                                </div>
+                                <button class="carousel-control-prev" type="button" data-bs-target="#imageCarousel"
+                                    data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#imageCarousel"
+                                    data-bs-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
+                            </div>
+                            <div class="zoom-buttons mt-3 text-center">
+                                <button id="zoomIn" class="btn btn-primary mx-2">Zoom In</button>
+                                <button id="zoomOut" class="btn btn-secondary mx-2">Zoom Out</button>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <script>
-            let currentScale = 1; // Initial scale for zoom
-
-            function loadMoreImages(productId) {
-                fetch(`/product/images/${productId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        const carouselInner = document.getElementById('carouselInner');
-                        carouselInner.innerHTML = ''; // Clear any previous images
-
-                        data.images.forEach((image, index) => {
-                            const carouselItem = document.createElement('div');
-                            carouselItem.classList.add('carousel-item');
-                            if (index === 0) {
-                                carouselItem.classList.add('active'); // Set the first image as active
-                            }
-
-                            const imgElement = document.createElement('img');
-                            imgElement.src = image.image_path;
-                            imgElement.classList.add('d-block', 'w-100', 'zoomable-image');
-                            imgElement.alt = 'Product Image';
-
-                            // Append the image to the carousel item
-                            carouselItem.appendChild(imgElement);
-                            carouselInner.appendChild(carouselItem);
-                        });
-
-                        // Show the modal
-                        const imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
-                        imageModal.show();
-
-                        // Reset scale when a new image is loaded
-                        currentScale = 1;
-                        document.querySelectorAll('.zoomable-image').forEach(image => {
-                            image.style.transform = `scale(${currentScale})`;
-                        });
-                    })
-                    .catch(error => console.error('Error loading images:', error));
-            }
-
-            // Zoom In function
-            document.getElementById('zoomIn').addEventListener('click', () => {
-                currentScale += 0.1; // Increase the scale
-                document.querySelectorAll('.zoomable-image').forEach(image => {
-                    image.style.transform = `scale(${currentScale})`;
-                });
-            });
-
-            // Zoom Out function
-            document.getElementById('zoomOut').addEventListener('click', () => {
-                currentScale = Math.max(1, currentScale - 0.1); // Prevent scale from going below 1
-                document.querySelectorAll('.zoomable-image').forEach(image => {
-                    image.style.transform = `scale(${currentScale})`;
-                });
-            });
-        </script>
-
-
-
-
-
-
-
-
-
-
-        <!-- Modal for Full Description -->
-        <div id="descriptionModal" class="modal">
-            <div class="modal-content">
-                <span class="close-btn">&times;</span>
-                <h4>Full Description</h4>
-                <p id="fullDescription"></p>
+            {{-- Pagination links --}}
+            <div class="pagination-container d-flex justify-content-center">
+                {{ $products->links() }}
             </div>
         </div>
 
+    </div>
 
-        {{-- Pagination links --}}
-        <div class="pagination-container d-flex justify-content-center">
-            {{ $products->links() }}
+    <script>
+        let currentScale = 1; // Initial scale for zoom
+
+        function loadMoreImages(productId) {
+            fetch(`/product/images/${productId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const carouselInner = document.getElementById('carouselInner');
+                    carouselInner.innerHTML = ''; // Clear any previous images
+
+                    data.images.forEach((image, index) => {
+                        const carouselItem = document.createElement('div');
+                        carouselItem.classList.add('carousel-item');
+                        if (index === 0) {
+                            carouselItem.classList.add('active'); // Set the first image as active
+                        }
+
+                        const imgElement = document.createElement('img');
+                        imgElement.src = image.image_path;
+                        imgElement.classList.add('d-block', 'w-100', 'zoomable-image');
+                        imgElement.alt = 'Product Image';
+
+                        // Append the image to the carousel item
+                        carouselItem.appendChild(imgElement);
+                        carouselInner.appendChild(carouselItem);
+                    });
+
+                    // Show the modal
+                    const imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
+                    imageModal.show();
+
+                    // Reset scale when a new image is loaded
+                    currentScale = 1;
+                    document.querySelectorAll('.zoomable-image').forEach(image => {
+                        image.style.transform = `scale(${currentScale})`;
+                    });
+                })
+                .catch(error => console.error('Error loading images:', error));
+        }
+
+        // Zoom In function
+        document.getElementById('zoomIn').addEventListener('click', () => {
+            currentScale += 0.1; // Increase the scale
+            document.querySelectorAll('.zoomable-image').forEach(image => {
+                image.style.transform = `scale(${currentScale})`;
+            });
+        });
+
+        // Zoom Out function
+        document.getElementById('zoomOut').addEventListener('click', () => {
+            currentScale = Math.max(1, currentScale - 0.1); // Prevent scale from going below 1
+            document.querySelectorAll('.zoomable-image').forEach(image => {
+                image.style.transform = `scale(${currentScale})`;
+            });
+        });
+    </script>
+
+
+
+
+
+
+
+
+
+
+    <!-- Modal for Full Description -->
+    <div id="descriptionModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h4>Full Description</h4>
+            <p id="fullDescription"></p>
         </div>
     </div>
+
+
+
 
     <script>
         setTimeout(function() {

@@ -60,6 +60,8 @@ class ProductController extends Controller
         // Get all categories to display in the filter
         $categories = ProductCategory::all();
 
+        // return view('pages.product.index', compact('products', 'categories', 'sortColumn', 'sortDirection'));
+
         return view('pages.product.index', compact('products', 'categories', 'sortColumn', 'sortDirection'));
     }
 

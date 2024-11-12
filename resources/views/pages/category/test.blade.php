@@ -1,243 +1,509 @@
 @extends('layouts.app')
 
-{{--  @section('head')
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-@endsection  --}}
-
 @section('styles')
     <style>
-        .form-container {
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: #52dd98;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        body {}
+
+
+
+        /* Styling for screens 877px or smaller */
+        @media screen and (max-width: 877px) {
+            body {
+                background-color: rgb(197, 197, 22) !important;
+            }
+
+            /* Adjust container widths for smaller screens */
+            .container,
+            .container-md,
+            .container-sm {
+                max-width: 100% !important;
+                padding: 0 15px;
+            }
+
+            /* Table container with scroll on small screens */
+            .table-container {
+                max-width: 100% !important;
+                margin: 20px auto;
+                overflow-x: auto;
+                /* Allows horizontal scroll if needed */
+            }
+
+            /* Pagination styling */
+            .pagination-container {
+                max-width: 100% !important;
+                margin: 10px auto;
+                text-align: center;
+            }
+
+            /* Product image adjustments */
+            .product-image {
+                width: 100px !important;
+                height: 100px !important;
+                background-size: cover;
+                background-position: center;
+            }
+
+            /* Hide columns for smaller screens */
+            .column-id,
+            .column-stock,
+            .column-category,
+            .column-actions {
+                display: none !important;
+            }
+
+            /* Table cell adjustments */
+            .table.table-bordered.table-striped td,
+            .table.table-bordered.table-striped th {
+                text-align: center !important;
+                font-size: 0.9rem !important;
+                padding: 8px !important;
+            }
+
+            /* Adjust card layout on smaller screens */
+            .card {
+                width: 100% !important;
+                margin: 10px 0;
+            }
+
+            .card-body {
+                padding: 10px !important;
+            }
         }
 
-        .image-preview {
-            margin-top: 5px;
-            width: 150px;
+
+        /* Category Filter and Refresh Button styling */
+        .category-filter {
+            margin-bottom: 1rem;
+        }
+
+        .refresh-button {
+            background-color: rgb(35, 123, 170);
+            color: white;
+            border: none;
+        }
+
+        .refresh-button:hover {
+            background-color: rgb(85, 181, 115);
+        }
+
+        /* Table column width settings */
+        .table {
+            table-layout: fixed;
+            width: 100%;
+            text-align: center;
+        }
+
+        table tr {
+            height: 50px;
+            text-align: center;
+            vertical-align: middle;
+
+        }
+
+        table td {
             height: 150px;
-            object-fit: cover;
-            border: 2px solid #ddd;
-            border-radius: 8px;
+            text-align: center;
+            vertical-align: middle;
+            /* Ensure the row height is applied through the cells */
         }
 
-        .remove-image-btn {
-            margin-top: 10px;
+        .column-id {
+            width: 7%;
+
+        }
+
+        .column-image {
+            width: 20%;
+        }
+
+        .column-name {
+            width: 10%;
+
+        }
+
+        .column-description {
+            width: 17%;
+        }
+
+        .column-price {
+            width: 9%;
+        }
+
+        .column-stock {
+            width: 10%;
+
+        }
+
+        .column-category {
+            width: 14%;
+        }
+
+        .column-actions {
+            width: 14%;
+        }
+
+        /* Modal styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
             display: none;
-            color: red;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 80%;
+            max-height: 80%;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            color: #aaa;
             cursor: pointer;
         }
 
-        .additional-image-preview {
-            margin-top: 5px;
-            width: 140px;
-            height: 140px;
+        .close-btn:hover {
+            color: black;
+        }
+
+
+
+        #imageCarousel .carousel-item img {
+            width: 450px;
+            height: 450px;
             object-fit: cover;
-            border: 2px solid #ddd;
-            border-radius: 8px;
+        }
+
+        .zoom-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .zoomable-image {
+            transition: transform 0.3s ease;
+            /* Smooth zoom effect */
+        }
+
+        .carousel-inner {
+            position: relative;
+        }
+
+        #zoomIn,
+        #zoomOut {
+            font-size: 16px;
+            padding: 8px 16px;
         }
     </style>
 @endsection
 
+
 @section('content')
-    @if ($errors->any())
-        <div class="alert alert-danger" style="position: relative; padding: 1rem;">
-            <ul style="margin: 0;">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-            <span style="position: absolute; right: 10px; top: 10px;">
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </span>
-        </div>
-    @endif
+    <div class="container">
 
-    <div class="container form-container">
-        <h1 class="text-center mb-4">Edit Product</h1>
-
-        <form action="{{ route('product.update', $product->id) }}" method="POST" enctype="multipart/form-data">
-            @csrf
-            @method('PUT')
-
-            <div class="form-group mb-3">
-                <label for="name">Product Name:</label>
-                <input type="text" class="form-control" id="name" name="name"
-                    value="{{ old('name', $product->name) }}" required>
-                @error('name')
-                    <div class="text-danger">{{ $message }}</div>
-                @enderror
-            </div>
-
-            <!-- Add other fields like description, price, etc. -->
-
-            {{-- Display the current image if available --}}
-            <div class="form-group mb-3">
-                <label for="mainImage">Product Image:</label>
-                <input type="file" class="form-control" id="mainImage" name="mainImage" accept="image/*">
-                @if ($product->mainImage)
-                    <div class="mt-2">
-                        <img src="{{ asset('storage/' . $product->mainImage) }}" alt="Product Image" class="img-thumbnail"
-                            width="150">
-                    </div>
-                @endif
-                <img id="imagePreview" class="image-preview" style="display:none;">
-                <span id="removeImage" class="remove-image-btn">Remove Image</span>
-            </div>
-
-            <!-- Multiple Image Upload Section -->
-            <div class="form-group mb-3">
-                <label for="additionalImages">Add Additional Images (up to 5):</label>
-                <input type="file" class="form-control" id="additionalImages" name="additionalImages[]" accept="image/*"
-                    multiple>
-                <div id="additionalImagePreviews1" class="d-flex flex-wrap gap-3 mt-2"></div>
-            </div>
-
-            <!-- Display existing images from the database -->
-            <div class="form-group mb-3">
-                <div id="additionalImagePreviews" class="d-flex flex-wrap gap-3 mt-2">
-                    @foreach ($product->images as $image)
-                        <div class="image-preview" id="image-{{ $image->id }}">
-                            <img src="{{ asset('storage/' . $image->image_path) }}" alt="Product Image"
-                                class="img-thumbnail additional-image-preview" width="100">
-                            <button type="button" class="btn btn-danger btn-sm"
-                                onclick="confirmDelete({{ $image->id }})">Delete</button>
-                        </div>
+        {{-- Display error messages --}}
+        @if ($errors->any())
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
                     @endforeach
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+
+        {{-- Session success message --}}
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+
+
+
+        <div class="table-container">
+            <h1 class="text-center mb-4">Product List</h1>
+
+            <!-- Add Product Button -->
+            <div class="mb-3">
+                <a href="{{ route('product.create') }}" class="btn btn-success">Add Product</a>
+            </div>
+
+            <div class="row">
+                <!-- Category Filter -->
+                <div class="category-filter mb-3 col-lg-5">
+                    <form action="{{ route('product.index') }}" method="GET" class="d-inline">
+                        <select class="form-select" name="category_id" onchange="this.form.submit()">
+                            <option value="">Select Category</option>
+                            @foreach ($categories as $category)
+                                <option value="{{ $category->id }}"
+                                    {{ request('category_id') == $category->id ? 'selected' : '' }}>
+                                    {{ $category->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </form>
+                </div>
+
+                <!-- Product Search -->
+                <div class="mb-3 col-lg-5">
+                    <form action="{{ route('product.index') }}" method="GET">
+                        <input type="hidden" name="category_id" value="{{ request('category_id') }}">
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="search" placeholder="Search products..."
+                                value="{{ request('search') }}">
+                            <button class="btn btn-primary" type="submit">Search</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Reset Filter Button -->
+                <div class="mb-3 col-lg-2">
+                    <a href="{{ route('product.index') }}" class="btn refresh-button ms-1">RESET</a>
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-primary btn-block">Update Product</button>
-        </form>
+            <!-- Product Cards -->
+            <div class="row">
+                @foreach ($products as $product)
+                    <div class="col-md-4 mb-4">
+                        <div class="card" style="width: 18rem;">
+                            <!-- Product Image -->
+                            @if ($product->mainImage)
+                                <img src="{{ asset('storage/' . $product->mainImage) }}" class="card-img-top"
+                                    alt="Product Image">
+                            @else
+                                <div
+                                    style="width: 100%; height: 180px; background-color: #f0f0f0; display: flex; align-items: center; justify-content: center;">
+                                    <span>No image available</span>
+                                </div>
+                            @endif
+
+                            <!-- Card Body -->
+                            <div class="card-body">
+                                <h5 class="card-title">{{ $product->name }}</h5>
+                                <p class="card-text">{{ Str::limit($product->description, 50) }}</p>
+                                <p class="card-text">Price: ${{ $product->price }}</p>
+                                <p class="card-text">Stock: {{ $product->stock }}</p>
+                                <p class="card-text">Category: {{ $product->category->name ?? 'N/A' }}</p>
+                            </div>
+
+                            <!-- List Group for Sorting and Category Info -->
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">
+                                    <a
+                                        href="{{ route('product.index', ['sort_column' => 'id', 'sort_direction' => $sortDirection == 'asc' ? 'desc' : 'asc', 'search' => request('search'), 'category_id' => request('category_id')]) }}">
+                                        Sort by ID {{ $sortColumn == 'id' ? ($sortDirection == 'asc' ? '↑' : '↓') : '' }}
+                                    </a>
+                                </li>
+                                <!-- Additional items could be added here if needed -->
+                            </ul>
+
+                            <!-- Card Footer with Action Links -->
+                            <div class="card-body d-flex justify-content-between">
+                                <a href="{{ route('product.edit', $product->id) }}" class="btn btn-primary btn-sm">Edit</a>
+                                <form id="deleteForm-{{ $product->id }}"
+                                    action="{{ route('product.destroy', $product->id) }}" method="POST">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="button" class="btn btn-danger btn-sm"
+                                        onclick="confirmDelete({{ $product->id }})">Delete</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
+            <!-- Modal for image preview (for additional image view if needed) -->
+            <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <div id="imageCarousel" class="carousel slide">
+                                <div class="carousel-inner" id="carouselInner">
+                                    <!-- Images will be dynamically added here -->
+                                </div>
+                                <button class="carousel-control-prev" type="button" data-bs-target="#imageCarousel"
+                                    data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#imageCarousel"
+                                    data-bs-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
+                            </div>
+                            <div class="zoom-buttons mt-3 text-center">
+                                <button id="zoomIn" class="btn btn-primary mx-2">Zoom In</button>
+                                <button id="zoomOut" class="btn btn-secondary mx-2">Zoom Out</button>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        {{-- Pagination links --}}
+        <div class="pagination-container d-flex justify-content-center">
+            {{ $products->links() }}
+        </div>
     </div>
 
+
     <script>
-        const maxImages = 5; // Maximum images allowed (including the existing ones)
-        const currentImages = {{ count($product->images) }}; // Count of existing images
+        let currentScale = 1; // Initial scale for zoom
 
-        document.getElementById('additionalImages').addEventListener('change', function(e) {
-            const previewContainer = document.getElementById('additionalImagePreviews1');
-            previewContainer.innerHTML = ''; // Clear previous previews
+        function loadMoreImages(productId) {
+            fetch(`/product/images/${productId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const carouselInner = document.getElementById('carouselInner');
+                    carouselInner.innerHTML = ''; // Clear any previous images
 
-            const files = Array.from(e.target.files);
+                    data.images.forEach((image, index) => {
+                        const carouselItem = document.createElement('div');
+                        carouselItem.classList.add('carousel-item');
+                        if (index === 0) {
+                            carouselItem.classList.add('active'); // Set the first image as active
+                        }
 
-            // Check if the number of selected images exceeds the limit
-            if (files.length + currentImages > maxImages) {
-                alert("You can only upload a total of 5 images.");
-                this.value = ''; // Clear the input
-                return;
-            }
+                        const imgElement = document.createElement('img');
+                        imgElement.src = image.image_path;
+                        imgElement.classList.add('d-block', 'w-100', 'zoomable-image');
+                        imgElement.alt = 'Product Image';
 
-            files.forEach((file, index) => {
-                const reader = new FileReader();
-                const previewWrapper = document.createElement('div');
-                previewWrapper.style.position = 'relative';
+                        // Append the image to the carousel item
+                        carouselItem.appendChild(imgElement);
+                        carouselInner.appendChild(carouselItem);
+                    });
 
-                const previewImage = document.createElement('img');
-                previewImage.classList.add('image-preview');
-                previewWrapper.appendChild(previewImage);
+                    // Show the modal
+                    const imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
+                    imageModal.show();
 
-                const removeButton = document.createElement('span');
-                removeButton.textContent = 'Remove Image';
-                removeButton.classList.add('remove-image-btn');
-                previewWrapper.appendChild(removeButton);
+                    // Reset scale when a new image is loaded
+                    currentScale = 1;
+                    document.querySelectorAll('.zoomable-image').forEach(image => {
+                        image.style.transform = `scale(${currentScale})`;
+                    });
+                })
+                .catch(error => console.error('Error loading images:', error));
+        }
 
-                previewContainer.appendChild(previewWrapper);
-
-                reader.onload = function(e) {
-                    previewImage.src = e.target.result;
-                    previewImage.style.display = 'block';
-                    removeButton.style.display = 'inline';
-                };
-                reader.readAsDataURL(file);
-
-                // Event listener to remove image
-                removeButton.addEventListener('click', function() {
-                    previewWrapper.remove();
-                    const fileList = Array.from(document.getElementById('additionalImages').files);
-                    fileList.splice(index, 1);
-                    const dataTransfer = new DataTransfer();
-                    fileList.forEach(file => dataTransfer.items.add(file));
-                    document.getElementById('additionalImages').files = dataTransfer.files;
-                });
+        // Zoom In function
+        document.getElementById('zoomIn').addEventListener('click', () => {
+            currentScale += 0.1; // Increase the scale
+            document.querySelectorAll('.zoomable-image').forEach(image => {
+                image.style.transform = `scale(${currentScale})`;
             });
         });
 
-        document.getElementById('mainImage').addEventListener('change', function(event) {
-            const preview = document.getElementById('imagePreview');
-            const removeButton = document.getElementById('removeImage');
-            const currentImage = document.querySelector('.img-thumbnail');
-            const file = event.target.files[0];
-
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    preview.src = e.target.result;
-                    preview.style.display = 'block';
-                    removeButton.style.display = 'inline';
-
-                    // Hide the current image preview if a new image is selected
-                    if (currentImage) {
-                        currentImage.style.display = 'none';
-                    }
-                };
-                reader.readAsDataURL(file);
-            }
+        // Zoom Out function
+        document.getElementById('zoomOut').addEventListener('click', () => {
+            currentScale = Math.max(1, currentScale - 0.1); // Prevent scale from going below 1
+            document.querySelectorAll('.zoomable-image').forEach(image => {
+                image.style.transform = `scale(${currentScale})`;
+            });
         });
+    </script>
 
-        document.getElementById('removeImage').addEventListener('click', function() {
-            const fileInput = document.getElementById('mainImage');
-            const preview = document.getElementById('imagePreview');
-            const currentImage = document.querySelector('.img-thumbnail');
 
-            fileInput.value = ''; // Clear the file input
-            preview.style.display = 'none'; // Hide the preview
-            this.style.display = 'none'; // Hide the remove button
 
-            // Show the original image again if it exists
-            if (currentImage) {
-                currentImage.style.display = 'block';
-            }
-        });
 
-        // Image Deletion
-        function confirmDelete(imageId) {
-            if (confirm('Are you sure you want to delete this image?')) {
-                deleteImage(imageId);
-            }
+
+
+
+
+
+
+    <!-- Modal for Full Description -->
+    <div id="descriptionModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h4>Full Description</h4>
+            <p id="fullDescription"></p>
+        </div>
+    </div>
+
+
+    {{-- Pagination links --}}
+    <div class="pagination-container d-flex justify-content-center">
+        {{ $products->links() }}
+    </div>
+    </div>
+
+    <script>
+        setTimeout(function() {
+            document.querySelectorAll('.alert').forEach(alert => alert.remove());
+        }, 5000);
+
+        function showFullDescription(description) {
+            document.getElementById('fullDescription').textContent = description;
+            document.getElementById('descriptionModal').style.display = 'flex';
         }
 
-        function deleteImage(imageId) {
-            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        document.querySelector('.close-btn').addEventListener('click', function() {
+            document.getElementById('descriptionModal').style.display = 'none';
+        });
 
-            fetch(`/delete-image/${imageId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken
-                    },
-                    body: JSON.stringify({
-                        imageId
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const imageElement = document.getElementById(`image-${imageId}`);
-                        if (imageElement) {
-                            imageElement.remove();
-                        }
-                    } else {
-                        alert('Failed to delete the image.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while deleting the image.');
-                });
+
+
+
+
+        //delete button
+
+        function confirmDelete(productId) {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You will not be able to recover this imaginary file!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonClass: "btn-danger",
+                confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "No, cancel please!",
+                reverseButtons: true,
+                closeOnConfirm: false,
+                closeOnCancel: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // If confirmed, submit the form
+                    document.getElementById(`deleteForm-${productId}`).submit();
+                    Swal.fire("Deleted!", "Your imaginary file has been deleted.", "success");
+                } else if (result.isDismissed) {
+                    Swal.fire("Cancelled", "Your imaginary file is safe", "error");
+                }
+            });
         }
     </script>
+
+    <script>
+        setTimeout(function() {
+            let alert = document.querySelector('.alert');
+            if (alert) {
+                alert.classList.remove('show');
+                alert.classList.add('hide');
+            }
+        }, 5000); // milliseconds
+    </script>
+
 @endsection

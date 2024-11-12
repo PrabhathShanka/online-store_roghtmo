@@ -37,3 +37,6 @@ Route::post('/product-images', [ProductImageController::class, 'store'])->name('
 Route::get('/products/{id}/images/upload', [ProductImageController::class, 'create'])->name('products.images.upload');
 Route::post('/products/{id}/images', [ProductImageController::class, 'store'])->name('products.images.store');
 Route::delete('/products/{id}/images/{imageId}', [ProductImageController::class, 'destroy'])->name('products.images.destroy');
+
+
+Route::get('/card', [ProductController::class, 'cardIndex'])->name('card.index');
