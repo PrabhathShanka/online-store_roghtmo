@@ -146,8 +146,8 @@ class ProductController extends Controller
             'stock' => 'required|integer',
             'category_id' => 'required|exists:product_categories,id',
             'mainImage' => 'nullable|image|mimes:jpeg,png,jpg|max:10240',
-            'additionalImages' => ['nullable', 'array', 'max:' . $remainingSlots], // Limit additional images based on remaining slots
-            'additionalImages.*' => 'nullable|image|mimes:jpeg,png,jpg|max:10240', // Validate each image
+            'additionalImages' => ['nullable', 'array', 'max:' . $remainingSlots],
+            'additionalImages.*' => 'nullable|image|mimes:jpeg,png,jpg|max:10240',
         ]);
 
         // Prepare data for updating the product

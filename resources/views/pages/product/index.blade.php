@@ -492,7 +492,7 @@
                 alert.classList.remove('show');
                 alert.classList.add('hide');
             }
-        }, 2000); // milliseconds
+        }, 5000); // milliseconds
     </script>
 
 

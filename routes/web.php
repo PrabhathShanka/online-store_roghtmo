@@ -22,6 +22,11 @@ Route::put('category/{id}', [ProductCategoryController::class, 'update'])->name(
 Route::delete('category/{id}', [ProductCategoryController::class, 'destroy'])->name('category.destroy');
 
 
+Route::get('/product/images/{id}', [ProductController::class, 'getImages'])->name('product.images');
+
+Route::delete('/delete-image/{image}', [ProductController::class, 'deleteImage'])->name('product.deleteImage');
+
+
 
 Route::get('/product-images/create', [ProductImageController::class, 'create'])->name('product_images.create');
 Route::post('/product-images', [ProductImageController::class, 'store'])->name('product_images.store');
@@ -32,10 +37,3 @@ Route::post('/product-images', [ProductImageController::class, 'store'])->name('
 Route::get('/products/{id}/images/upload', [ProductImageController::class, 'create'])->name('products.images.upload');
 Route::post('/products/{id}/images', [ProductImageController::class, 'store'])->name('products.images.store');
 Route::delete('/products/{id}/images/{imageId}', [ProductImageController::class, 'destroy'])->name('products.images.destroy');
-
-
-
-
-Route::get('/product/images/{id}', [ProductController::class, 'getImages'])->name('product.images');
-
-Route::delete('/delete-image/{image}', [ProductController::class, 'deleteImage'])->name('product.deleteImage');
