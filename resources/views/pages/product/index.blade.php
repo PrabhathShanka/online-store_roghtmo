@@ -502,13 +502,13 @@
 
         </div>
 
-        {{--  -------------------------------------Moble------------------------------------  --}}
+        {{--  -------------------------------------------------------------------------  --}}
 
         <!-- Centering Container -->
-        <div style="display: flex; justify-content: center; align-items: center; padding: 20px;">
+        <div style="display: flex; justify-content: center; align-items: center; padding: 20px; ">
 
             <!-- Product Table Container -->
-            <div class="table-container card" style="width: 90%; max-width: 1200px;">
+            <div class="table-container card" style="width: 100%; max-width: 1200px;">
                 <h1 class="text-center mb-4">Product List</h1>
 
                 <!-- Add Product Button -->
@@ -550,6 +550,27 @@
                     </div>
                 </div>
 
+
+                <!-- Sorting Links -->
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <div style="display: flex; justify-content: space-between;">
+                            <a
+                                href="{{ route('product.index', ['sort_column' => 'name', 'sort_direction' => $sortDirection == 'asc' ? 'desc' : 'asc', 'search' => request('search'), 'category_id' => request('category_id')]) }}">
+                                Name @if ($sortColumn == 'name')
+                                    <span>{{ $sortDirection == 'asc' ? '↑' : '↓' }}</span>
+                                @endif
+                            </a>
+                            <a
+                                href="{{ route('product.index', ['sort_column' => 'price', 'sort_direction' => $sortDirection == 'asc' ? 'desc' : 'asc', 'search' => request('search'), 'category_id' => request('category_id')]) }}">
+                                Price @if ($sortColumn == 'price')
+                                    <span>{{ $sortDirection == 'asc' ? '↑' : '↓' }}</span>
+                                @endif
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+
                 <!-- Product Cards -->
                 <div class="row justify-content-center">
 
@@ -575,25 +596,7 @@
                                 </div>
 
 
-                                <!-- Sorting Links -->
-                                <ul class="list-group list-group-flush">
-                                    <li class="list-group-item">
-                                        <div style="display: flex; justify-content: space-between;">
-                                            <a
-                                                href="{{ route('product.index', ['sort_column' => 'name', 'sort_direction' => $sortDirection == 'asc' ? 'desc' : 'asc', 'search' => request('search'), 'category_id' => request('category_id')]) }}">
-                                                Name @if ($sortColumn == 'name')
-                                                    <span>{{ $sortDirection == 'asc' ? '↑' : '↓' }}</span>
-                                                @endif
-                                            </a>
-                                            <a
-                                                href="{{ route('product.index', ['sort_column' => 'price', 'sort_direction' => $sortDirection == 'asc' ? 'desc' : 'asc', 'search' => request('search'), 'category_id' => request('category_id')]) }}">
-                                                Price @if ($sortColumn == 'price')
-                                                    <span>{{ $sortDirection == 'asc' ? '↑' : '↓' }}</span>
-                                                @endif
-                                            </a>
-                                        </div>
-                                    </li>
-                                </ul>
+
 
                                 <!-- Card Body with fixed height -->
                                 <div class="card-body" style="min-height: 200px;">
@@ -641,6 +644,21 @@
     </div>
 
     </div>
+
+
+
+
+
+    <!-- Modal for Full Description -->
+    <div id="descriptionModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h4>Full Description</h4>
+            <p id="fullDescription"></p>
+        </div>
+    </div>
+
+
 
     <script>
         let currentScale = 1; // Initial scale for zoom
@@ -700,22 +718,6 @@
     </script>
 
 
-
-
-
-
-
-
-
-
-    <!-- Modal for Full Description -->
-    <div id="descriptionModal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn">&times;</span>
-            <h4>Full Description</h4>
-            <p id="fullDescription"></p>
-        </div>
-    </div>
 
 
 
