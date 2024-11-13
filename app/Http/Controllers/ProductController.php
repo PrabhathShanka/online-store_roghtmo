@@ -131,10 +131,10 @@ class ProductController extends Controller
 
 
 
-    public function update(Request $request, $id)
+    public function update(Request $request, Product $product)
     {
         // Retrieve the product and count existing additional images
-        $product = Product::findOrFail($id);
+        // $product = Product::findOrFail($id);
         $existingImageCount = $product->images()->count();
 
         // Calculate how many additional images can be uploaded (max 5 total)
