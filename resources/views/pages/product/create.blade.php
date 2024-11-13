@@ -179,5 +179,82 @@
                 });
             });
         });
+
+
+
+        //validation
+        document.querySelector("form").addEventListener("submit", function(event) {
+            // Prevent form submission if validation fails
+            let isValid = true;
+
+            // Validate Product Name
+            const name = document.getElementById("name").value;
+            if (!name || name.length > 255) {
+                alert("Product Name is required and must not exceed 255 characters.");
+                isValid = false;
+            }
+
+            // Validate Description (Optional, but should be a string if provided)
+            const description = document.getElementById("description").value;
+            if (description && typeof description !== 'string') {
+                alert("Description must be a valid string.");
+                isValid = false;
+            }
+
+            // Validate Price
+            const price = document.getElementById("price").value;
+            if (!price || isNaN(price)) {
+                alert("Price is required and must be a number.");
+                isValid = false;
+            }
+
+            // Validate Stock Quantity
+            const stock = document.getElementById("stock").value;
+            if (!stock || !Number.isInteger(Number(stock))) {
+                alert("Stock Quantity is required and must be an integer.");
+                isValid = false;
+            }
+
+            // Validate Category
+            const category = document.getElementById("category_id").value;
+            if (!category) {
+                alert("Category is required.");
+                isValid = false;
+            }
+
+            // Validate Main Image (Optional, but must be a valid image format if provided)
+            const mainImage = document.getElementById("mainImage").files[0];
+            if (mainImage && !["image/jpeg", "image/png", "image/jpg"].includes(mainImage.type)) {
+                alert("Main image must be a file of type jpeg, png, or jpg.");
+                isValid = false;
+            }
+            if (mainImage && mainImage.size > 10240 * 1024) {
+                alert("Main image must be smaller than 10MB.");
+                isValid = false;
+            }
+
+            // Validate Additional Images (Optional, but each must be a valid image format and limit to 5)
+            const additionalImages = document.getElementById("additionalImages").files;
+            if (additionalImages.length > 5) {
+                alert("You can upload a maximum of 5 additional images.");
+                isValid = false;
+            }
+            for (let i = 0; i < additionalImages.length; i++) {
+                const file = additionalImages[i];
+                if (!["image/jpeg", "image/png", "image/jpg"].includes(file.type)) {
+                    alert("Each additional image must be a file of type jpeg, png, or jpg.");
+                    isValid = false;
+                    break;
+                }
+                if (file.size > 10240 * 1024) {
+                    alert("Each additional image must be smaller than 10MB.");
+                    isValid = false;
+                    break;
+                }
+            }
+
+            // Prevent form submission if validation fails
+            if (!isValid) event.preventDefault();
+        });
     </script>
 @endsection

@@ -95,6 +95,8 @@
 
         .navbar-toggler {
             border: none;
+            color: white;
+            background: white;
         }
 
         .navbar-toggler-icon {
