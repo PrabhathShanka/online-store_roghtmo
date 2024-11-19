@@ -1,130 +1,36 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>{{ config('app.name', 'Laravel') }}</title>
 
-    <title>Product</title>
+        <!-- Fonts -->
+        <link rel="preconnect" href="https://fonts.bunny.net">
+        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
-    @include('libraries.styles')
-    {{--  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">  --}}
+        <!-- Scripts -->
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    </head>
+    <body class="font-sans antialiased">
+        <div class="min-h-screen bg-gray-100">
+            @include('layouts.navigation')
 
+            <!-- Page Heading -->
+            @isset($header)
+                <header class="bg-white shadow">
+                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                        {{ $header }}
+                    </div>
+                </header>
+            @endisset
 
-
-
-
-
-    <style>
-        /* Navbar style */
-        .navbar {
-            width: 100%;
-            background-color: #0e173d !important;
-            padding: 15px;
-
-        }
-
-
-
-
-        /* Footer Container */
-        footer {
-            position: fixed;
-            /* Fixes the footer at the bottom */
-            left: 0;
-            bottom: 0;
-            width: 100%;
-            background-color: #0e173d !important;
-            color: #faf4f4 !important;
-            height: 60px;
-            /* Adjust the height of the footer */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 10px;
-            /* Optional padding inside the footer */
-            font-size: 14px;
-            /* Optional font size */
-        }
-
-
-
-        .navbar a:hover {
-            background-color: #78a7dc !important;
-            /* Change color on hover */
-            border-radius: 5px;
-            /* Rounded corners */
-        }
-
-        .navbar-brand {
-            color: #f5f5f6;
-            /* brand link color */
-            font-weight: bold;
-            font-size: 1.5rem;
-        }
-
-        .navbar-brand:hover {
-            color: #194677;
-            /* hover effect for brand */
-        }
-
-
-
-        .navbar-nav .nav-link {
-            font-weight: bold;
-
-        }
-
-        .navbar-nav .nav-link.active {
-            color: #fef7f7;
-            /* Change the active link color if needed */
-        }
-
-        .navbar-nav .nav-link:hover {
-            color: #ffffff;
-            /* Change hover color */
-        }
-
-
-        .nav-link:hover {
-            color: #115297;
-
-            {{--  text-decoration: underline;  --}}
-        }
-
-        .navbar-toggler {
-            border: none;
-            color: white;
-            background: white;
-        }
-
-        .navbar-toggler-icon {
-            color: #007bff;
-        }
-
-        body {
-            padding-top: 70px;
-            /* Adjust this value to match the height of your navbar */
-        }
-    </style>
-
-
-    <!-- Yield for page-specific styles -->
-    @yield('styles')
-    @yield('head')
-</head>
-
-<body>
-
-    @include('components.nav')
-    <div class="container">
-
-        @yield('content')
-
-        @include('libraries.scripts')
-    </div>
-    @include('components.footer')
-</body>
-
+            <!-- Page Content -->
+            <main>
+                {{ $slot }}
+            </main>
+        </div>
+    </body>
 </html>

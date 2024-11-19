@@ -1,16 +1,6 @@
-@extends('layouts.app')
-
+@extends('layouts.app1')
+<link rel="stylesheet" href="{{ asset('CSS/category/edit.css') }}">
 @section('styles')
-    <style>
-        .form-container {
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: #52dd98;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-    </style>
 @endsection
 
 @section('content')
@@ -52,13 +42,5 @@
             <button type="submit" class="btn btn-primary btn-block">Update Category</button>
         </form>
     </div>
-    <script>
-        setTimeout(function() {
-            let alert = document.querySelector('.alert');
-            if (alert) {
-                alert.classList.remove('show');
-                alert.classList.add('hide');
-            }
-        }, 2000); // milliseconds
-    </script>
+    <script src="{{ asset('JS/category/index.js') }}"></script>
 @endsection

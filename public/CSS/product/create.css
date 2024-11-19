@@ -1,0 +1,24 @@
+.form-container {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #52dd98;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.image-preview {
+    margin-top: 5px;
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+}
+
+.remove-image-btn {
+    margin-top: 10px;
+    display: none;
+    color: red;
+    cursor: pointer;
+}

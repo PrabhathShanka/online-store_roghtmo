@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 
 class ProductCategoryController extends Controller
 {
+
+
+
     public function index(Request $request)
     {
         // Check if a sort column is provided; default to 'name' for alphabetical order or 'id' if 'name' is not preferred.

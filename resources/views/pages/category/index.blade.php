@@ -1,38 +1,36 @@
-@extends('layouts.app')
+@extends('layouts.app1')
 
 @section('styles')
-    <style>
-        .table-container {
-            max-width: 800px;
-            margin: 50px auto;
-        }
-
-        .pagination-container {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
+    <link rel="stylesheet" href="{{ asset('CSS/category/index.css') }}">
+@endsection
 
 
-        .table {
-            table-layout: fixed;
-            width: 70%;
-            margin: 0 auto;
+@section('add_nav_right_side')
+    {{-- Category Search --}}
+    <div class="mb-3 col-lg-4">
+        <form action="{{ route('category.index') }}" method="GET">
+            <div class="input-group">
+                <input type="text" class="form-control" name="search" placeholder="Search categories..."
+                    value="{{ request('search') }}">
+                <button class="btn btn-primary" type="submit">Search</button>
+            </div>
+        </form>
+    </div>
+    </div>
+@endsection
 
-        }
 
-        .column-id {
-            width: 15%;
-        }
+@section('add_nav_left_side')
+    <li class="nav-item">
+        <a class="nav-link active" href="#">Home</a>
+    </li>
 
-
-        .column-category {
-            width: 30%;
-        }
-
-        .column-actions {
-            width: 25%;
-        }
-    </style>
+    <li class="nav-item">
+        <a class="nav-link active" href="{{ route('product.index') }}">Products</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link active" href="{{ route('category.index') }}">Categories</a>
+    </li>
 @endsection
 
 @section('content')
@@ -68,107 +66,65 @@
                 <a href="{{ route('category.create') }}" class="btn btn-success">Add Category</a>
             </div>
 
-            {{-- Category Search --}}
-            <div class="mb-3 col-lg-4">
-                <form action="{{ route('category.index') }}" method="GET">
-                    <div class="input-group">
-                        <input type="text" class="form-control" name="search" placeholder="Search categories..."
-                            value="{{ request('search') }}">
-                        <button class="btn btn-primary" type="submit">Search</button>
-                    </div>
-                </form>
+
+            <!-- Category Table -->
+            <table class="table table-bordered table-striped ali">
+                <thead>
+                    <tr>
+                        <th class="column-id">
+                            <a
+                                href="{{ route('category.index', ['sort_column' => 'id', 'sort_direction' => $sortDirection == 'asc' ? 'desc' : 'asc', 'search' => request('search')]) }}">
+                                ID
+                                @if ($sortColumn == 'id')
+                                    <span>{{ $sortDirection == 'asc' ? '↑' : '↓' }}</span>
+                                @endif
+                            </a>
+                        </th>
+                        <th class="column-category">
+                            <a
+                                href="{{ route('category.index', ['sort_column' => 'name', 'sort_direction' => $sortDirection == 'asc' ? 'desc' : 'asc', 'search' => request('search')]) }}">
+                                Category
+                                @if ($sortColumn == 'name')
+                                    <span>{{ $sortDirection == 'asc' ? '↑' : '↓' }}</span>
+                                @endif
+                            </a>
+                        </th>
+                        <th class="column-actions">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($categories as $category)
+                        <tr>
+                            <td>{{ $category->id }}</td>
+                            <td>{{ $category->name }}</td>
+                            <td>
+                                <div class="d-inline-flex align-items-center">
+                                    <a href="{{ route('category.edit', $category->id) }}"
+                                        class="btn btn-primary btn-sm me-1">Edit</a>
+                                    <form id="deleteForm-{{ $category->id }}"
+                                        action="{{ route('category.destroy', $category->id) }}" method="POST"
+                                        class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="button" class="btn btn-danger btn-sm"
+                                            onclick="confirmDelete({{ $category->id }})">Delete</button>
+                                    </form>
+
+                                </div>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+
+            {{-- Pagination --}}
+            <div class="pagination-container d-flex justify-content-center">
+                {{ $categories->links() }}
             </div>
         </div>
 
-        <!-- Category Table -->
-        <table class="table table-bordered table-striped ali">
-            <thead>
-                <tr>
-                    <th class="column-id">
-                        <a
-                            href="{{ route('category.index', ['sort_column' => 'id', 'sort_direction' => $sortDirection == 'asc' ? 'desc' : 'asc', 'search' => request('search')]) }}">
-                            ID
-                            @if ($sortColumn == 'id')
-                                <span>{{ $sortDirection == 'asc' ? '↑' : '↓' }}</span>
-                            @endif
-                        </a>
-                    </th>
-                    <th class="column-category">
-                        <a
-                            href="{{ route('category.index', ['sort_column' => 'name', 'sort_direction' => $sortDirection == 'asc' ? 'desc' : 'asc', 'search' => request('search')]) }}">
-                            Category
-                            @if ($sortColumn == 'name')
-                                <span>{{ $sortDirection == 'asc' ? '↑' : '↓' }}</span>
-                            @endif
-                        </a>
-                    </th>
-                    <th class="column-actions">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($categories as $category)
-                    <tr>
-                        <td>{{ $category->id }}</td>
-                        <td>{{ $category->name }}</td>
-                        <td>
-                            <div class="d-inline-flex align-items-center">
-                                <a href="{{ route('category.edit', $category->id) }}"
-                                    class="btn btn-primary btn-sm me-1">Edit</a>
-                                <form id="deleteForm-{{ $category->id }}"
-                                    action="{{ route('category.destroy', $category->id) }}" method="POST"
-                                    class="d-inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="button" class="btn btn-danger btn-sm"
-                                        onclick="confirmDelete({{ $category->id }})">Delete</button>
-                                </form>
-
-                            </div>
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-
-        {{-- Pagination --}}
-        <div class="pagination-container d-flex justify-content-center">
-            {{ $categories->links() }}
-        </div>
-    </div>
-
-    <script>
-        setTimeout(function() {
-            let alert = document.querySelector('.alert');
-            if (alert) {
-                alert.classList.remove('show');
-                alert.classList.add('hide');
-            }
-        }, 2000); // milliseconds
 
 
-        //  delete button
+        <script src="{{ asset('JS/category/index.js') }}"></script>
 
-        function confirmDelete(categoryId) {
-            Swal.fire({
-                title: "Are you sure?",
-                text: "You will not be able to recover this category!",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonClass: "btn-danger",
-                confirmButtonText: "Yes, delete it!",
-                cancelButtonText: "No, cancel please!",
-                reverseButtons: true,
-                closeOnConfirm: false,
-                closeOnCancel: false
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // If confirmed, submit the form
-                    document.getElementById(`deleteForm-${categoryId}`).submit();
-                    Swal.fire("Deleted!", "The category has been deleted.", "success");
-                } else if (result.isDismissed) {
-                    Swal.fire("Cancelled", "Your category is safe :)", "error");
-                }
-            });
-        }
-    </script>
-@endsection
+    @endsection
