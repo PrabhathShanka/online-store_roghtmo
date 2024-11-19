@@ -36,14 +36,13 @@ Route::group(['middleware' => ['role:buyer']], function () {
 
 
 
-Route::group(['middleware' => ['role:seller']], function () {
+Route::group(['middleware' => ['role:seller'], 'prefix' => 'product'], function () {
     Route::get('/index', [ProductController::class, 'index'])->name('product.index');
-
-    Route::get('/product/create', [ProductController::class, 'create'])->name('product.create');
-    Route::post('/product', [ProductController::class, 'store'])->name('product.store');
-    Route::get('product/{id}/edit', [ProductController::class, 'edit'])->name('product.edit');
-    Route::put('product/{id}', [ProductController::class, 'update'])->name('product.update');
-    Route::delete('product/{id}', [ProductController::class, 'destroy'])->name('product.destroy');
+    Route::get('/create', [ProductController::class, 'create'])->name('product.create');
+    Route::post('/', [ProductController::class, 'store'])->name('product.store');
+    Route::get('{id}/edit', [ProductController::class, 'edit'])->name('product.edit');
+    Route::put('{id}', [ProductController::class, 'update'])->name('product.update');
+    Route::delete('{id}', [ProductController::class, 'destroy'])->name('product.destroy');
 });
 
 

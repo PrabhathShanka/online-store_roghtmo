@@ -49,6 +49,7 @@ class RegisteredUserController extends Controller
 
         // Assign a default role (using the role name, e.g., 'buyer')
         $user->assignRole('buyer');  // 'buyer' , 'seller'
+
         event(new Registered($user));
 
         Auth::login($user);
