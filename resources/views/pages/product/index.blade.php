@@ -1,281 +1,67 @@
-@extends('layouts.app')
+@extends('layouts.app1')
 
 @section('styles')
-    <style>
-        body {
-
-            .table-container.card {
-                display: none;
-            }
-
-            .table-container {
-                display: block;
-            }
-
-            {{--  background-color: lightgreen;  --}}
-
-            /* Table container styling */
-            .table-container {
-                max-width: 90%;
-                margin: 50px auto;
-            }
-
-            .pagination-container {
-                max-width: 80%;
-                margin: 0 auto;
-            }
-
-            .product-image {
-                width: 170px;
-                height: 170px;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                background-size: cover;
-                background-position: center;
-            }
-
-
-
-        }
-
-        /* On screens that are 992px wide or less, the background color is blue */
-        @media screen and (max-width: 1200px) {
-            body {
-
-                .table-container.card {
-                    display: none;
-                }
-
-                .table-container {
-                    display: block;
-                }
-
-
-                {{--  background-color: rgb(43, 60, 190);  --}}
-
-                /* Table container styling */
-                .table-container {
-                    max-width: 90%;
-                    margin: 50px auto;
-                }
-
-                .pagination-container {
-                    max-width: 80%;
-                    margin: 0 auto;
-                }
-
-                .product-image {
-                    width: 140px;
-                    height: 140px;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    background-size: cover;
-                    background-position: center;
-                }
-            }
-        }
-
-        /* On screens that are 600px wide or less, the background color is olive */
-        @media screen and (max-width: 992px) {
-            body {
-                {{--  background-color: rgb(190, 43, 165);  --}} .table-container.card {
-                    display: none;
-                }
-
-                .table-container {
-                    display: block;
-                }
-
-                /* Table container styling */
-                .container,
-                .container-md,
-                .container-sm {
-                    max-width: max-content;
-                }
-
-                .table-container {
-                    max-width: 100%;
-                    margin: 50px auto;
-                }
-
-                .pagination-container {
-                    max-width: 80%;
-                    margin: 0 auto;
-                }
-
-                .product-image {
-                    width: 140px;
-                    height: 140px;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    background-size: cover;
-                    background-position: center;
-                }
-            }
-        }
-
-
-        /* Styling for screens 877px or smaller */
-        @media screen and (max-width: 877px) {
-            body {
-                .table-container {
-                    display: none;
-                }
-
-
-
-                .table-container.card {
-                    display: block;
-                }
-
-
-            }
-        }
-
-
-
-
-        /* Category Filter and Refresh Button styling */
-        .category-filter {
-            margin-bottom: 1rem;
-        }
-
-        .refresh-button {
-            background-color: rgb(35, 123, 170);
-            color: white;
-            border: none;
-        }
-
-        .refresh-button:hover {
-            background-color: rgb(85, 181, 115);
-        }
-
-        /* Table column width settings */
-        .table {
-            table-layout: fixed;
-            width: 100%;
-            text-align: center;
-        }
-
-        table tr {
-            height: 50px;
-            text-align: center;
-            vertical-align: middle;
-
-        }
-
-        table td {
-            height: 150px;
-            text-align: center;
-            vertical-align: middle;
-            /* Ensure the row height is applied through the cells */
-        }
-
-        .column-id {
-            width: 7%;
-
-        }
-
-        .column-image {
-            width: 20%;
-        }
-
-        .column-name {
-            width: 10%;
-
-        }
-
-        .column-description {
-            width: 17%;
-        }
-
-        .column-price {
-            width: 9%;
-        }
-
-        .column-stock {
-            width: 10%;
-
-        }
-
-        .column-category {
-            width: 14%;
-        }
-
-        .column-actions {
-            width: 14%;
-        }
-
-        /* Modal styles */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            display: none;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            max-width: 80%;
-            max-height: 80%;
-            overflow-y: auto;
-            position: relative;
-        }
-
-        .close-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 24px;
-            color: #aaa;
-            cursor: pointer;
-        }
-
-        .close-btn:hover {
-            color: black;
-        }
-
-
-
-        #imageCarousel .carousel-item img {
-            width: 450px;
-            height: 450px;
-            object-fit: cover;
-        }
-
-        .zoom-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .zoomable-image {
-            transition: transform 0.3s ease;
-            /* Smooth zoom effect */
-        }
-
-        .carousel-inner {
-            position: relative;
-        }
-
-        #zoomIn,
-        #zoomOut {
-            font-size: 16px;
-            padding: 8px 16px;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ asset('CSS/product/index.css') }}">
 @endsection
 
+@section('add_nav_right_side')
+    <div class="row">
+        {{-- Category Filter --}}
+        <div class="category-filter mb-3 col-lg-5">
+            <form action="{{ route('product.index') }}" method="GET" class="d-inline">
+                <select class="form-select" name="category_id" onchange="this.form.submit()">
+                    <option value="">Select Category</option>
+                    @foreach ($categories as $category)
+                        <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
+                            {{ $category->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </form>
+        </div>
+
+        {{-- Product Search --}}
+        <div class="mb-3 col-lg-5">
+            <form action="{{ route('product.index') }}" method="GET">
+                <input type="hidden" name="category_id" value="{{ request('category_id') }}">
+                <div class="input-group">
+                    <input type="text" class="form-control" name="search" placeholder="Search products..."
+                        value="{{ request('search') }}">
+                    <button class="btn btn-primary" type="submit">Search</button>
+                </div>
+            </form>
+        </div>
+
+        {{-- Reset Filter Button --}}
+        <div class="mb-3 col-lg-2">
+            <a href="{{ route('product.index') }}" class="btn refresh-button ms-1">RESET</a>
+        </div>
+    </div>
+@endsection
+
+
+@section('add_nav_left_side')
+    <li class="nav-item">
+        <a class="nav-link active" href="#">Home</a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link active" href="{{ route('product.index') }}">Products</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link active" href="{{ route('category.index') }}">Categories</a>
+    </li>
+    <!-- Authentication -->
+    <form method="POST" action="{{ route('logout') }}">
+        @csrf
+
+        <x-responsive-nav-link :href="route('logout')"
+            onclick="event.preventDefault();
+                            this.closest('form').submit();">
+            {{ __('Log Out') }}
+        </x-responsive-nav-link>
+    </form>
+@endsection
 
 @section('content')
     <div class="container">
@@ -312,39 +98,7 @@
                 <a href="{{ route('product.create') }}" class="btn btn-success">Add Product</a>
             </div>
 
-            <div class="row">
-                {{-- Category Filter --}}
-                <div class="category-filter mb-3 col-lg-5">
-                    <form action="{{ route('product.index') }}" method="GET" class="d-inline">
-                        <select class="form-select" name="category_id" onchange="this.form.submit()">
-                            <option value="">Select Category</option>
-                            @foreach ($categories as $category)
-                                <option value="{{ $category->id }}"
-                                    {{ request('category_id') == $category->id ? 'selected' : '' }}>
-                                    {{ $category->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </form>
-                </div>
 
-                {{-- Product Search --}}
-                <div class="mb-3 col-lg-5">
-                    <form action="{{ route('product.index') }}" method="GET">
-                        <input type="hidden" name="category_id" value="{{ request('category_id') }}">
-                        <div class="input-group">
-                            <input type="text" class="form-control" name="search" placeholder="Search products..."
-                                value="{{ request('search') }}">
-                            <button class="btn btn-primary" type="submit">Search</button>
-                        </div>
-                    </form>
-                </div>
-
-                {{-- Reset Filter Button --}}
-                <div class="mb-3 col-lg-2">
-                    <a href="{{ route('product.index') }}" class="btn refresh-button ms-1">RESET</a>
-                </div>
-            </div>
 
             <!-- Product Table -->
             <div class="container-fluid table-wrap">
@@ -660,122 +414,7 @@
 
 
 
-    <script>
-        let currentScale = 1; // Initial scale for zoom
-
-        function loadMoreImages(productId) {
-            fetch(`/product/images/${productId}`)
-                .then(response => response.json())
-                .then(data => {
-                    const carouselInner = document.getElementById('carouselInner');
-                    carouselInner.innerHTML = ''; // Clear any previous images
-
-                    data.images.forEach((image, index) => {
-                        const carouselItem = document.createElement('div');
-                        carouselItem.classList.add('carousel-item');
-                        if (index === 0) {
-                            carouselItem.classList.add('active'); // Set the first image as active
-                        }
-
-                        const imgElement = document.createElement('img');
-                        imgElement.src = image.image_path;
-                        imgElement.classList.add('d-block', 'w-100', 'zoomable-image');
-                        imgElement.alt = 'Product Image';
-
-                        // Append the image to the carousel item
-                        carouselItem.appendChild(imgElement);
-                        carouselInner.appendChild(carouselItem);
-                    });
-
-                    // Show the modal
-                    const imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
-                    imageModal.show();
-
-                    // Reset scale when a new image is loaded
-                    currentScale = 1;
-                    document.querySelectorAll('.zoomable-image').forEach(image => {
-                        image.style.transform = `scale(${currentScale})`;
-                    });
-                })
-                .catch(error => console.error('Error loading images:', error));
-        }
-
-        // Zoom In function
-        document.getElementById('zoomIn').addEventListener('click', () => {
-            currentScale += 0.1; // Increase the scale
-            document.querySelectorAll('.zoomable-image').forEach(image => {
-                image.style.transform = `scale(${currentScale})`;
-            });
-        });
-
-        // Zoom Out function
-        document.getElementById('zoomOut').addEventListener('click', () => {
-            currentScale = Math.max(1, currentScale - 0.1); // Prevent scale from going below 1
-            document.querySelectorAll('.zoomable-image').forEach(image => {
-                image.style.transform = `scale(${currentScale})`;
-            });
-        });
-    </script>
-
-
-
-
-
-
-    <script>
-        setTimeout(function() {
-            document.querySelectorAll('.alert').forEach(alert => alert.remove());
-        }, 5000);
-
-        function showFullDescription(description) {
-            document.getElementById('fullDescription').textContent = description;
-            document.getElementById('descriptionModal').style.display = 'flex';
-        }
-
-        document.querySelector('.close-btn').addEventListener('click', function() {
-            document.getElementById('descriptionModal').style.display = 'none';
-        });
-
-
-
-
-
-        //delete button
-
-        function confirmDelete(productId) {
-            Swal.fire({
-                title: "Are you sure?",
-                text: "You will not be able to recover this imaginary file!",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonClass: "btn-danger",
-                confirmButtonText: "Yes, delete it!",
-                cancelButtonText: "No, cancel please!",
-                reverseButtons: true,
-                closeOnConfirm: false,
-                closeOnCancel: false
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // If confirmed, submit the form
-                    document.getElementById(`deleteForm-${productId}`).submit();
-                    Swal.fire("Deleted!", "Your imaginary file has been deleted.", "success");
-                } else if (result.isDismissed) {
-                    Swal.fire("Cancelled", "Your imaginary file is safe", "error");
-                }
-            });
-        }
-    </script>
-
-    <script>
-        setTimeout(function() {
-            let alert = document.querySelector('.alert');
-            if (alert) {
-                alert.classList.remove('show');
-                alert.classList.add('hide');
-            }
-        }, 5000); // milliseconds
-    </script>
-
+    <script src="{{ asset('JS/product/index.js') }}"></script>
 
 
 @endsection

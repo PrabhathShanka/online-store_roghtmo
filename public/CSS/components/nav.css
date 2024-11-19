@@ -1,0 +1,58 @@
+/* Navbar style */
+.navbar {
+    width: 100%;
+    background-color: #0e173d !important;
+    padding: 15px;
+}
+
+.navbar a:hover {
+    background-color: #78a7dc !important;
+    /* Change color on hover */
+    border-radius: 5px;
+    /* Rounded corners */
+}
+
+.navbar-brand {
+    color: #f5f5f6;
+    /* brand link color */
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.navbar-brand:hover {
+    color: #194677;
+    /* hover effect for brand */
+}
+
+.navbar-nav .nav-link {
+    font-weight: bold;
+}
+
+.navbar-nav .nav-link.active {
+    color: #fef7f7;
+    /* Change the active link color if needed */
+}
+
+.navbar-nav .nav-link:hover {
+    color: #ffffff;
+    /* Change hover color */
+}
+
+.nav-link:hover {
+    color: #115297;
+}
+
+.navbar-toggler {
+    border: none;
+    color: white;
+    background: white;
+}
+
+.navbar-toggler-icon {
+    color: #007bff;
+}
+
+body {
+    padding-top: 70px;
+    /* Adjust this value to match the height of your navbar */
+}

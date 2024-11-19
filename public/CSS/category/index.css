@@ -1,0 +1,27 @@
+.table-container {
+    max-width: 800px;
+    margin: 50px auto;
+}
+
+.pagination-container {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.table {
+    table-layout: fixed;
+    width: 70%;
+    margin: 0 auto;
+}
+
+.column-id {
+    width: 15%;
+}
+
+.column-category {
+    width: 30%;
+}
+
+.column-actions {
+    width: 25%;
+}

@@ -1,16 +1,7 @@
-@extends('layouts.app')
+@extends('layouts.app1')
 
 @section('styles')
-    <style>
-        .form-container {
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: #52dd98;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-    </style>
+    <link rel="stylesheet" href="{{ asset('CSS/create/index.css') }}">
 @endsection
 
 @section('content')
@@ -51,13 +42,5 @@
             <button type="submit" class="btn btn-primary btn-block">Add Category</button>
         </form>
     </div>
-    <script>
-        setTimeout(function() {
-            let alert = document.querySelector('.alert');
-            if (alert) {
-                alert.classList.remove('show');
-                alert.classList.add('hide');
-            }
-        }, 2000); // milliseconds
-    </script>
+    <script src="{{ asset('JS/category/index.js') }}"></script>
 @endsection
