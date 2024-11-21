@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\Product_Image;
 use App\Models\ProductCategory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
@@ -28,14 +29,58 @@ class ProductController extends Controller
 
 
 
+    // public function index(Request $request)
+    // {
+    //     // Set default values for sorting
+    //     $sortColumn = $request->input('sort_column', 'id'); // Default to 'id' for sorting by ID
+    //     $sortDirection = $request->input('sort_direction', 'asc'); // Default to ascending order
+
+    //     // Start the query, loading related images and category
+    //     $query = Product::with(['images', 'category']);
+
+    //     // Category filter if category_id is provided
+    //     if ($request->filled('category_id')) {
+    //         $query->where('category_id', $request->category_id);
+    //     }
+
+    //     // Search filter if search is provided
+    //     if ($request->filled('search')) {
+    //         $search = $request->input('search');
+    //         $query->where(function ($query) use ($search) {
+    //             $query->where('name', 'like', "%{$search}%")
+    //                 ->orWhere('description', 'like', "%{$search}%");
+    //         });
+    //     }
+
+    //     // Apply     to the query
+    //     $query->orderBy($sortColumn, $sortDirection);
+
+    //     // Paginate results and append parameters to pagination links
+    //     $products = $query->paginate(5)->appends($request->only(['sort_column', 'sort_direction', 'search', 'category_id']));
+
+    //     // Get all categories to display in the filter
+    //     $categories = ProductCategory::all();
+
+    //     // return view('pages.product.index', compact('products', 'categories', 'sortColumn', 'sortDirection'));
+
+    //     return view('pages.product.index', compact('products', 'categories', 'sortColumn', 'sortDirection'));
+    // }
+
+
     public function index(Request $request)
     {
+        // Get the authenticated user's ID
+        // $userId = auth()->id(); // Ensure authentication middleware is applied to this route
+
+        $userId['user_id'] = Auth::id();
+
         // Set default values for sorting
         $sortColumn = $request->input('sort_column', 'id'); // Default to 'id' for sorting by ID
         $sortDirection = $request->input('sort_direction', 'asc'); // Default to ascending order
 
-        // Start the query, loading related images and category
-        $query = Product::with(['images', 'category']);
+        // Start the query, loading related images and category, and filter by user_id
+        $query = Product::with(['images', 'category'])
+            ->where('user_id', $userId); // Restrict products to those belonging to the authenticated user
 
         // Category filter if category_id is provided
         if ($request->filled('category_id')) {
@@ -51,7 +96,7 @@ class ProductController extends Controller
             });
         }
 
-        // Apply     to the query
+        // Apply sorting to the query
         $query->orderBy($sortColumn, $sortDirection);
 
         // Paginate results and append parameters to pagination links
@@ -60,10 +105,9 @@ class ProductController extends Controller
         // Get all categories to display in the filter
         $categories = ProductCategory::all();
 
-        // return view('pages.product.index', compact('products', 'categories', 'sortColumn', 'sortDirection'));
-
         return view('pages.product.index', compact('products', 'categories', 'sortColumn', 'sortDirection'));
     }
+
 
 
 
@@ -74,6 +118,43 @@ class ProductController extends Controller
         $category = ProductCategory::all();
         return view('pages.product.create', compact('category'));
     }
+
+    // public function store(Request $request)
+    // {
+    //     $request->validate([
+    //         'name' => 'required|string|max:255',
+    //         'description' => 'nullable|string',
+    //         'price' => 'required|numeric',
+    //         'stock' => 'required|integer',
+    //         'category_id' => 'required|exists:product_categories,id',
+    //         'mainImage' => 'nullable|image|mimes:jpeg,png,jpg|max:10240',
+    //         'additionalImages' => 'array|max:5',
+    //         'additionalImages.*' => 'nullable|image|mimes:jpeg,png,jpg|max:10240',
+    //     ]);
+
+    //     $data = $request->only(['name', 'description', 'price', 'stock', 'category_id']);
+
+    //     // Handle main image upload
+    //     if ($request->hasFile('mainImage')) {
+    //         $imagePath = $request->file('mainImage')->store('products/MainImage', 'public');
+    //         $data['mainImage'] = $imagePath;
+    //     }
+
+    //     // Create the product
+    //     $product = Product::create($data);
+
+    //     // Handle additional images
+    //     if ($request->hasFile('additionalImages')) {
+    //         foreach ($request->file('additionalImages') as $image) {
+    //             $imagePath = $image->store('products', 'public');
+    //             $product->images()->create(['image_path' => $imagePath]);
+    //         }
+    //     }
+
+    //     session()->flash('success', 'Product added successfully with images!');
+    //     return redirect()->route('product.index');
+    // }
+
 
     public function store(Request $request)
     {
@@ -88,7 +169,15 @@ class ProductController extends Controller
             'additionalImages.*' => 'nullable|image|mimes:jpeg,png,jpg|max:10240',
         ]);
 
+        // Collect form data
         $data = $request->only(['name', 'description', 'price', 'stock', 'category_id']);
+
+        // Add the authenticated user's ID to the data
+
+
+        $data['user_id'] = Auth::id();
+
+
 
         // Handle main image upload
         if ($request->hasFile('mainImage')) {
@@ -110,8 +199,6 @@ class ProductController extends Controller
         session()->flash('success', 'Product added successfully with images!');
         return redirect()->route('product.index');
     }
-
-
 
 
 

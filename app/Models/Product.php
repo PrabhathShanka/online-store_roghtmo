@@ -16,6 +16,8 @@ class Product extends Model
         'stock',
         'category_id',
         'mainImage',
+        'user_id',
+
     ];
 
     public function category()
@@ -26,5 +28,10 @@ class Product extends Model
     public function images()
     {
         return $this->hasMany(Product_Image::class, 'product_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }
